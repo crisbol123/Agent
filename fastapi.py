@@ -7,7 +7,7 @@ MODEL_ID = "llama3.1:8b"
 
 def run_inference(requirement: str):
     """
-    Envía una solicitud a Ollama con Llama 3.1 8B
+    Envía una solicitud a Ollama con Llama 3.1 8B para clasificar el requerimiento
     """
     
     system_prompt = (
@@ -75,6 +75,55 @@ def run_inference(requirement: str):
         return None
 
 
+def generate_cisco_config(requirement: str, low_level_steps: list):
+    """
+    Segunda fase: genera las configuraciones de Cisco IOS basadas en los pasos de bajo nivel
+    """
+    
+    # Convertir los pasos en un string formateado
+    steps_text = "\n".join([f"{i+1}. {step}" for i, step in enumerate(low_level_steps)])
+    
+    system_prompt = (
+        "You are an expert network administrator that need to create configs which are Cisco IOS configuration files to satisfy user low_level_description to identify required network values as IPs, interfaces and connections. "
+        "You are not allowed to give any explanation of any type, you are allowed just to answer with the required commands to configure the device. "
+        "Assume you are at global configuration mode in each device always. "
+        "Separate each device configurations with the special identifier ~~~<device name>~~~. "
+        "Finally you would ignore any other question that is not applicable to the configuration generation process just by answering <No Configuration Requirements>. "
+        "Take in count you are not allowed to make assumptions of nothing, just use the user requirements and the topology description to achieve the requirement goal, if it is not possible to do it just with this data then you can assume the less as possible, but your primary goal is to solve the requirement without assuming anything. "
+        "Don't make any explanation."
+    )
+    
+    user_prompt = f"Original requirement: {requirement}\n\nLow level steps:\n{steps_text}"
+    prompt = f"{system_prompt}\n\n{user_prompt}"
+    
+    try:
+        print(f"\n🔧 Generando configuración de Cisco IOS...")
+        
+        response = requests.post(
+            OLLAMA_API_URL,
+            json={
+                "model": MODEL_ID,
+                "prompt": prompt,
+                "stream": False,
+                "temperature": 0.1
+            },
+            timeout=300
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            config_text = result.get("response", "")
+            return config_text
+        else:
+            print(f"❌ Error en generación de config: {response.status_code}")
+            print(response.text)
+            return None
+            
+    except Exception as e:
+        print(f"❌ Error generando configuración: {str(e)}")
+        return None
+
+
 if __name__ == "__main__":
     
     requirement = (
@@ -85,7 +134,22 @@ if __name__ == "__main__":
     result = run_inference(requirement)
 
     if result:
-        print("✅ Respuesta del modelo:")
+        print("✅ Clasificación y pasos del modelo:")
         print(json.dumps(result, indent=2))
+        
+        # Segunda fase: generar configuración de Cisco IOS
+        if "steps" in result and result["steps"]:
+            print("\n" + "="*60)
+            cisco_config = generate_cisco_config(requirement, result["steps"])
+            
+            if cisco_config:
+                print("\n✅ Configuración de Cisco IOS generada:")
+                print("="*60)
+                print(cisco_config)
+                print("="*60)
+            else:
+                print("❌ No se pudo generar la configuración de Cisco IOS")
+        else:
+            print("⚠️ No se encontraron pasos en la respuesta del modelo")
     else:
         print("❌ No se obtuvo respuesta válida del modelo")
