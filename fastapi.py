@@ -78,8 +78,8 @@ def run_inference(requirement: str):
 if __name__ == "__main__":
     
     requirement = (
-        "How can we monitor and store download time within the Cisco device "
-        "and configure IP and application layer options for optimal performance?"
+        "How can I verify and troubleshoot why OSPF neighbors are not forming between two Cisco routers?"
+
     )
 
     result = run_inference(requirement)
