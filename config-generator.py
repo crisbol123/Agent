@@ -75,7 +75,7 @@ def run_inference(requirement: str):
         return None
 
 
-def generate_cisco_config(requirement: str, low_level_steps: list):
+def generate_cisco_config(requirement: str, low_level_steps: list, topology_info: str = ""):
     """
     Segunda fase: genera las configuraciones de Cisco IOS basadas en los pasos de bajo nivel
     """
@@ -84,16 +84,32 @@ def generate_cisco_config(requirement: str, low_level_steps: list):
     steps_text = "\n".join([f"{i+1}. {step}" for i, step in enumerate(low_level_steps)])
     
     system_prompt = (
-        "You are an expert network administrator that need to create configs which are Cisco IOS configuration files to satisfy user low_level_description to identify required network values as IPs, interfaces and connections. "
-        "You are not allowed to give any explanation of any type, you are allowed just to answer with the required commands to configure the device. "
-        "Assume you are at global configuration mode in each device always. "
-        "Separate each device configurations with the special identifier ~~~<device name>~~~. "
-        "Finally you would ignore any other question that is not applicable to the configuration generation process just by answering <No Configuration Requirements>. "
-        "Take in count you are not allowed to make assumptions of nothing, just use the user requirements and the topology description to achieve the requirement goal, if it is not possible to do it just with this data then you can assume the less as possible, but your primary goal is to solve the requirement without assuming anything. "
-        "Don't make any explanation."
+        "You are an expert network administrator that generates Cisco IOS commands.\n\n"
+        
+        "CRITICAL RULES:\n"
+        "1. If the requirement is for VERIFICATION or TROUBLESHOOTING, use ONLY show/debug commands (show ip ospf neighbor, show running-config, debug, etc.)\n"
+        "2. If the requirement is for CONFIGURATION, use config commands (router ospf, interface, ip address, etc.)\n"
+        "3. Configure ONLY what is EXPLICITLY requested - DO NOT add extra commands, features, or configurations not mentioned\n"
+        "4. DO NOT invent or assume ANY values: IPs, interfaces, hostnames, process IDs, subnet masks, VLANs, authentication, etc.\n"
+        "5. DO NOT add authentication, costs, timers, priorities, or any feature NOT specifically requested\n"
+        "6. If information is missing and you cannot complete the task, respond ONLY: <INSUFFICIENT_DATA: specify what is needed>\n"
+        "7. Group ALL commands for each device under ONE separator: ~~~<device_name>~~~\n"
+        "8. NO explanations, NO comments, NO markdown, ONLY commands\n"
+        "9. If not applicable to configuration, respond ONLY: <No Configuration Requirements>\n\n"
+        
+        "OUTPUT FORMAT:\n"
+        "~~~Device1~~~\n"
+        "command1\n"
+        "command2\n"
+        "~~~Device2~~~\n"
+        "command1\n"
+        "command2\n"
     )
     
-    user_prompt = f"Original requirement: {requirement}\n\nLow level steps:\n{steps_text}"
+    user_prompt = f"Original requirement: {requirement}\n\nSteps to implement:\n{steps_text}"
+    if topology_info:
+        user_prompt += f"\n\nTopology information:\n{topology_info}"
+    
     prompt = f"{system_prompt}\n\n{user_prompt}"
     
     try:
@@ -105,7 +121,7 @@ def generate_cisco_config(requirement: str, low_level_steps: list):
                 "model": MODEL_ID,
                 "prompt": prompt,
                 "stream": False,
-                "temperature": 0.1
+                "temperature": 0.01
             },
             timeout=300
         )
@@ -127,9 +143,18 @@ def generate_cisco_config(requirement: str, low_level_steps: list):
 if __name__ == "__main__":
     
     requirement = (
-        "How can I verify and troubleshoot why OSPF neighbors are not forming between two Cisco routers?"
-
+        "Configure OSPF process 10 area 0 on Router1 interface Gi0/0 with IP 192.168.1.1/30"
     )
+    
+    # Opcional: información de topología para evitar que el modelo asuma valores
+    topology_info = (
+        "Router1: hostname R1, interface GigabitEthernet0/0 with IP 192.168.1.1/30\n"
+        "Router2: hostname R2, interface GigabitEthernet0/0 with IP 192.168.1.2/30\n"
+        "OSPF process ID: 1\n"
+        "OSPF area: 0"
+    )
+    
+    # Si no tienes info de topología, déjalo vacío: topology_info = ""
 
     result = run_inference(requirement)
 
@@ -140,7 +165,8 @@ if __name__ == "__main__":
         # Segunda fase: generar configuración de Cisco IOS
         if "steps" in result and result["steps"]:
             print("\n" + "="*60)
-            cisco_config = generate_cisco_config(requirement, result["steps"])
+            # Pasar topología vacía para probar si el modelo pide datos
+            cisco_config = generate_cisco_config(requirement, result["steps"], topology_info="")
             
             if cisco_config:
                 print("\n✅ Configuración de Cisco IOS generada:")
