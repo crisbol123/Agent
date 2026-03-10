@@ -30,22 +30,43 @@ def run_inference(requirement: str):
     """
     
     system_prompt = (
-        "You are a network configuration assistant.\n"
-        "Classify the requirement as one of: CP, RP, ACL, TN.\n"
-        "CP is used for monitoring, performance, NetFlow, IP settings, and application layer configuration.\n"
-        "RP is used for routing protocols such as OSPF, BGP, RIP, routing tables.\n"
-        "ACL is used for access control lists and firewall rules.\n"
-        "TN is used ONLY for tunnels and VPNs such as IPSec, GRE, or site-to-site tunnels.\n"
-        "Return ONLY a valid JSON object in the following format:\n"
+        "You are a network configuration assistant.\n\n"
+        
+        "TASK 1 - CLASSIFY the requirement as one of:\n"
+        "- CP: monitoring, performance, NetFlow, IP settings, application layer configuration\n"
+        "- RP: routing protocols (OSPF, BGP, RIP), routing tables\n"
+        "- ACL: access control lists, firewall rules\n"
+        "- TN: tunnels and VPNs (IPSec, GRE, site-to-site)\n\n"
+        
+        "TASK 2 - GENERATE detailed implementation steps:\n"
+        "- Break down the requirement into specific, actionable steps\n"
+        "- Each step must be clear and technical\n"
+        "- Include what needs to be configured/verified on which device\n"
+        "- Be specific about protocols, interfaces, and actions\n"
+        "- Generate at least 3-5 steps depending on complexity\n\n"
+        
+        "EXAMPLE for 'Configure OSPF between R1 and R2':\n"
+        "{\n"
+        '  "type": "RP",\n'
+        '  "steps": [\n'
+        '    "Enable OSPF process on R1 with appropriate process ID",\n'
+        '    "Configure OSPF network statements on R1 for connected interfaces",\n'
+        '    "Enable OSPF process on R2 with matching process ID",\n'
+        '    "Configure OSPF network statements on R2 for connected interfaces",\n'
+        '    "Verify OSPF neighbor adjacency between R1 and R2"\n'
+        '  ]\n'
+        "}\n\n"
+        
+        "OUTPUT FORMAT - Return ONLY valid JSON:\n"
         "{\n"
         '  "type": "CP | RP | ACL | TN",\n'
-        '  "steps": ["step 1", "step 2", "next steps"]\n'
-        "}\n"
-        "Rules:\n"
-        "- Output ONLY JSON\n"
-        "- No explanations\n"
-        "- No markdown\n"
-        "- No extra text"
+        '  "steps": ["detailed step 1", "detailed step 2", "..."]\n'
+        "}\n\n"
+        
+        "RULES:\n"
+        "- Output ONLY JSON, no markdown, no explanations\n"
+        "- Steps must be detailed and actionable\n"
+        "- Minimum 3 steps, more if needed"
     )
     
     prompt = f"{system_prompt}\n\nUser requirement: {requirement}"
@@ -90,18 +111,26 @@ def generate_cisco_config(requirement: str, low_level_steps: list, topology_info
     system_prompt = (
         "You are an expert network administrator that generates Cisco IOS commands.\n\n"
         
+        "CISCO IOS COMMAND MODES:\n"
+        "- TROUBLESHOOTING/VERIFICATION: Use only show/debug commands in privileged EXEC mode\n"
+        "- CONFIGURATION: Use 'configure terminal' to enter config mode, add config commands, then 'end'\n"
+        "- NEVER mix show/debug commands with configuration mode commands\n\n"
+        
         "CRITICAL RULES:\n"
-        "1. If the requirement is for VERIFICATION or TROUBLESHOOTING, use ONLY show/debug commands (show ip ospf neighbor, show running-config, debug, etc.)\n"
-        "2. If the requirement is for CONFIGURATION, use config commands (router ospf, interface, ip address, etc.)\n"
+        "1. If the requirement is for VERIFICATION or TROUBLESHOOTING, use ONLY show/debug commands\n"
+        "2. If the requirement is for CONFIGURATION, use config commands\n"
         "3. Configure ONLY what is EXPLICITLY requested - DO NOT add extra commands, features, or configurations not mentioned\n"
         "4. DO NOT invent or assume ANY values: IPs, interfaces, hostnames, process IDs, subnet masks, VLANs, authentication, etc.\n"
         "5. DO NOT add authentication, costs, timers, priorities, or any feature NOT specifically requested\n"
         "6. If information is missing and you cannot complete the task, respond ONLY: <INSUFFICIENT_DATA: specify what is needed>\n"
         "7. Group ALL commands for each device under ONE separator: ~~~<device_name>~~~\n"
         "8. NO explanations, NO comments, NO markdown, ONLY commands\n"
-        "9. If not applicable to configuration, respond ONLY: <No Configuration Requirements>\n\n"
+        "9. If not applicable to configuration, respond ONLY: <No Configuration Requirements>\n"
+        "10. DO NOT mix show/debug commands with configuration mode commands\n"
+        "11. For troubleshooting, list show/debug commands directly without 'configure terminal'\n"
+        "12. For configuration, start with 'configure terminal', add config commands, end with 'end'\n\n"
         
-        "OUTPUT FORMAT:\n"
+        "OUTPUT FORMAT (one command per line, executable in sequence):\n"
         "~~~Device1~~~\n"
         "command1\n"
         "command2\n"
@@ -124,7 +153,7 @@ def generate_cisco_config(requirement: str, low_level_steps: list, topology_info
                 "prompt": prompt,
                 "stream": False,
                 "temperature": 0.01
-            },
+            }, 
             timeout=300
         )
         

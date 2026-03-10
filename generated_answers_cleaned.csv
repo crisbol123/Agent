@@ -1,0 +1,737 @@
+requirement,model_answer
+Configure the network interface to use Ethernet encapsulation connected to a Eheternet 802.3 network. Ensure that the interface is set to the Ethernet encapsulation type and that it is properly assigned an IP address and subnet mask consistent with Ethernet standards.,"    ~~~device_name~~~~
+    interface Ethernet0/0
+     encapsulation dot1q 10
+     ip address 192.168.1.100 255.25"
+Configure the network interface for Frame Relay encapsulation. Set up a Frame Relay subnetwork with one physical link and multiple virtual circuits (VCs). Assign a Data-Link Connection Identifier (DLCI) to each VC within the frame's address field.,"   ~~~router1~~~~
+    interface serial 0/0
+    encapsulation frame-relay
+    frame-relay lmi-keepalive
+    frame-relay map 100 10.1.1.1 100
+    frame-relay map 200 10.1.2.1 200
+    frame-relay map 300"
+"Configure the network interface to use SNAP encapsulation. Ensure that the interface is set to SNAP encapsulation and is properly configured for operation on either FDDI or Token Ring networks, as specified.","   ```
+    interface FastEthernet0/0
+     encapsulation snap
+     snap-encapsulation fddi
+     snap-encapsulation tr
+    ```"
+Configure static ARP entries on the network device to permanently map IP addresses to MAC addresses in the ARP cache.,"   ```cisco
+    Router(config)# ip arp static 192.168.1.100 00:11:22:33:44:55
+    Router(config)# ip arp static 192.168.1.101 00:22:33:44:55:66
+    ...
+    ```"
+Globally disable proxy ARP,"    ~~~device1~~~~
+    no ip proxy-arp
+    ~~~device2~~~~
+    no ip proxy-arp
+    �"
+Disabling Proxy ARP on interface gigabit1/0/1,"    ```cisco
+    ~~~gigabit1/0/1~~~
+    no ip proxy-arp
+    point-to-point
+    ```"
+clear the Address Resolution Protocol (ARP) cache of entries associated with Interface gigabitethernet1/0,"   ```cisco
+    ~~~gigabitethernet1/0/1~~~~
+    arp timeout 120
+    arp cache clear
+    ```"
+Disable OSPF on Router1,"    ```
+    Router1# configure terminal
+    Router1(config)# no router ospf 1
+    Router1(config)# interface FastEthernet0/0
+    Router1(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router1(config-if)# no ip redirects
+    Router1(config-if)# ip ospf 1 area 0
+    Router1(config-if)# exit
+    R"
+Enable OSPF on Router2,"    ### Cisco IOS Configuration:
+    ```
+    Router2# configure terminal
+    Router2(config)# router ospf 1
+    Router2(config-router)# network 192.168.1.0 0.0.0.255 area 0
+    Router2(config-router)# priority 110
+    Router2(config-router)# exit
+    Router2(config)# interface FastEthernet0/0
+    Router2(config-if)# ip address 192.168.1.1"
+Change the IP address of Router3 LAN interface to a new subnet,"    ~~~Router3~~~~
+    interface FastEthernet0/0
+    ip address 192.168.1.1 255.255.255.0
+    hub"
+Increase the bandwidth of Router1's WAN interface to accommodate more traffic,"    ```
+    Router1# configure terminal
+    Router1(config)# interface fastethernet 0/0
+    Router1(config-if)# bandwidth 10000
+    Router1(config-if)# exit
+    Router1(config)#
+    ```"
+Decrease the bandwidth of Router2's LAN interface to limit traffic,"    ```
+    Router2# configure terminal
+    Router2(config)# interface fastethernet 0/1
+    Router2(config-if)# bandwidth 10000
+    Router2(config-if)# exit
+    ```"
+Add a new VLAN to Router3's LAN interface for network segmentation,"    ```
+    Router3# configure terminal
+    Router"
+Remove VLAN from Router4's LAN interface for simplification,"    ```
+    Router4# configure terminal
+    Router4(config)# interface FastEthernet0/0
+    Router4(config-if)# no switchport mode trunk
+    Router4(config-if)# no switchport trunk allowed vlan 10
+    Router4(config-if)# no switchport trunk native vlan 10
+    Router4(config-if)# no switchport trunk native vlan 20
+    Router4(config-if)# no switchport trunk native vlan 30
+    Router4(config-if)# no switch"
+Configure Router1 to Router2 link to use a different encapsulation method,"    ```
+    Router1# configure terminal
+    Router1(config)# interface serial 0/0
+    Router1(config-if)# encapsulation aal5snap
+    Router1(config-if)# exit
+    Router1(config)#
+   
+    Router2# configure terminal
+    Router2(config)# interface serial 0/0
+    Router2(config-if)# encapsulation aal5snap
+    Router2(config-if)# exit
+    Router2(config)#
+    ```   "
+Implement Quality of Service (QoS) policies on Router2 for VoIP traffic,"    ```
+    Router2# configure terminal
+    Router2(config)# policy-map voip-qos
+    Router2(config-pmap)# class voip
+    Router2(config-pmap-c)# priority 1
+    Router2(config-pmap-c)# bandwidth 1000
+    Router2(config-pmap-c)# exit
+    Router2(config-pmap)# exit
+    Router2(config)# interface Fast"
+Increase the MTU size on Router3's WAN interface to support jumbo frames,"    ```
+    Router3# configure terminal
+    Router3(config)# interface fastethernet 0/0
+    Router3(config-if)# mtu 9000
+    Router3(config-if)# exit
+    Router3(config)#
+    ```"
+Configure Router4 to use a different routing protocol for WAN connectivity,"    ~~~Router4~~~~
+    router bgp 65535
+    neighbor 10.1.1.1 remote-as 65535
+    neighbor 10.1.1.1 update-source Loopback0
+    neighbor 10.1.1.1 next-hop-self"
+Implement Port Address Translation (PAT) on Router1 for outbound internet access,"    ```
+    Router1# configure terminal
+    Router1(config)# ip nat inside
+    Router1(config)# ip nat outside
+    Router1(config)# interface FastEthernet0/0
+    Router1(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router1(config-if)# no shutdown
+    Router1(config-if)# exit
+    Router1(config)# ip nat pool 10.0.0.1 "
+Implement Dynamic NAT on Router3 for LAN to WAN communication,"    ~~~Router3~~~~
+    ip nat pool R3_NAT_POOL 192.168.1.100 192.168.1.150 netmask 255.255.255.0
+    ip nat inside source list R3_INSIDE_LIST pool R3_NAT_POOL"
+Configure Router2 to act as a DHCP server for its LAN network,"    ```
+    Router2(config)# ip dhcp pool LAN
+    Router2(dhcp-config)"
+Disable IPv6 routing on Router4,"    ```
+    Router4# configure terminal
+    Router4(config)# no ipv6 routing
+    Router4(config)# ip route 192.168.1.0/24 10.1.1.1
+    ```"
+Implement IPv6 addressing on Router1's WAN interface,"    ```
+    Router1# configure terminal
+    Router1(config)# interface fastethernet 0/0
+    Router1(config-if)# ipv6 address 2001:DB8:123"
+Change the administrative distance of OSPF on Router2 to prioritize routes,"    ```
+    Router2# configure terminal
+    Router2(config)# router ospf 1
+    Router2(config-router)# distance 110
+    ```"
+Configure Router3 to advertise specific routes via OSPF,"    ~~~Router3~~~~
+    router ospfv3 1
+     area 0.0.0.0
+     network 10.1.1.0/24 area 0
+     network 10.2.2.0/24 area 0
+     cost 10
+     metric 100
+"
+Implement IPsec VPN between Router1 and Router4 for secure communication,"    ~~~Router1~~~~
+    crypto isakmp policy 10
+      authentication pre-share
+      encryption aes
+      group 2
+      lifetime 3600
+    crypto ipsec transform-set TS1 esp-aes esp-sha-hmac
+    crypto map R1_VPN 10 ipsec-isakmp set transform-set TS1
+    crypto map R1_VPN 10 match address 100
+    crypto map R1_VPN 10 set pfs group2
+    crypto map R1_VPN 10 set peer Router4"
+Enable SNMP on all routers for network monitoring,"
+    ~~~router1~~~~
+    snmp-server enable traps
+    snmp-server host 192.168.1.100 version 2c
+    snmp-server community public
+    ```
+    ```
+    ~~~router2~~~~
+    snmp-server enable traps
+    snmp-server host 192.168.1.100 version 2c
+    snmp-server community public
+    ```
+    ```
+    ~~~router3~~~~
+    snmp-server enable traps
+    snmp-server host 192.168"
+Configure Router2 to authenticate users connecting through Telnet,"    ```
+    Router2# configure terminal
+    Router2(config)# aaa authentication login default group radius
+    Router2(config)# aaa accounting network start-stop group radius
+    Router2(config)# username admin password password
+    ```"
+Implement SSH on Router3 for secure remote management,"
+    Router3# configure terminal
+    Router3(config)# crypto key generate rsa modulus 2048
+    Router3(config)# ip ssh version 2
+    Router3(config)# line vty 0 4
+    Router3(config-line)# login local
+    Router3(config-line)# transport input ssh
+    Router3(config-line)# exec-timeout 0 0
+    Router3(config-line)# no exec-timeout 0 0
+    Router3(config-line)# exit
+    Router3("
+Configure Router4 to use a different DNS server for name resolution,"   ```
+    Router4(config)# ip name-server 192.0.2.10
+    ```"
+Implement Access Control Lists (ACLs) on Router1 to filter inbound traffic,"    ~~~Router1~~~~
+    access-list 101 permit ip 192.168.1.0 0.0.0.255 any
+    access-list 101 deny ip any any
+    interface fastethernet 0/0
+    ip address 192"
+Change the priority of Router3 in the OSPF network,"    ```
+    Router3# configure terminal
+    Router3(config)# router ospf 1
+    Router3(config-router)# priority 100
+    ```"
+Configure Router4 to perform NAT overload for LAN to WAN traffic,"    ~~~Router4~~~~
+    ip nat inside
+    ip nat outside
+    ip nat pool LAN_POOL 192.168.1.100 192.168.1.200 netmask 255.255.255.0
+    ip nat inside source static 192.168.1.100 10.1.1.100
+    ip nat inside source static 192.168.1.101 10.1.1.101"
+Implement BGP routing protocol on Router1 for external connectivity,"    - Use AS 65000 as the autonomous system number.
+    - Configure Router1 as a BGP router with IP address 10.1.1.1 and subnet mask 255.255.255.0.
+    - Set the BGP router ID to 10.1.1.1.
+    - Configure Router1 to advertise its IP address 10.1.1.1 as a BGP neighbor.
+    - Configure Router1 to receive BGP updates from Router2 (IP address 10.2.2.2) and Router3 (IP"
+Configure Router2 to use a different routing metric for OSPF,"    ```cisco
+    Router2# configure terminal
+    Router2(config)# router ospf 1
+    Router2(config-router)# metric 100
+    Router2(config-router)# exit
+    Router2(config)# end
+    ```"
+Implement VRF (Virtual Routing and Forwarding) on Router3 for network isolation,"    ```
+    Router3# configure terminal
+    Router3(config)# vrf definition vrf_name
+    Router3(config-vrf)# exit
+    Router3(config)# interface type number
+    Router3(config-if)# ip vrf forwarding vrf_name
+    Router3(config-if)# exit
+    ```"
+Configure Router4 to use a different default gateway for specific traffic,"    ~~~Router4~~~~
+    ip cef
+    ip route 192.168.1.0/24 10.1.1.1
+    ip route 10.1.1.0/24 192.168.1.1"
+Implement traffic shaping on Router1 to limit bandwidth for HTTP traffic.,"    ```
+    Router1(config)# policy-map http-traffic-shaping
+    Router1(config-pmap)# class class-default
+    Router1(config-pmap-c)# shape average 10000000
+    Router1(config-pmap-c)# police rate 10000000
+    Router1(config-pmap-c)# conform-action transmit
+    Router1(config-pmap-c)# exceed-action drop
+    Router1(config-pmap-c)# violate-"
+Configure Router2 to prioritize VoIP traffic over other traffic types.,"      ~~~Router2~~~~
+    priority-group 100
+    class-map match-any voip-traffic
+      match protocol rtp
+    policy-map voip-policy
+      class voip-traffic
+        priority 100
+    service-policy voip-policy"
+Implement Class-Based Weighted Fair Queuing (CBWFQ) on Router3 for LAN traffic.,"    ```cisco
+    ~~~Router3~~~~
+    class-map match-any LAN_TRAFFIC
+      match ip dscp ef
+    policy-map LAN_POLICY
+      class LAN_TRAFFIC
+        priority 10000
+    service-policy input LAN_POLICY
+    ```"
+Configure Router4 to classify and mark packets for expedited forwarding (EF).,"    ```
+    Router4(config)# class-map match-any EF
+    Router4(config-cmap)# match ip dscp ef
+    Router4(config-cmap)# exit
+    Router4(config)# policy-map EF-Policy
+    Router4(config-pmap)# class EF
+    Router4(config-pmap-c)# set qos-group 1
+    Router4(config-pmap-c)# exit
+    Router4(config)# interface FastEthernet0/0
+   "
+Implement policy-based QoS on Router1 to prioritize traffic from specific VLANs.,"    ```cisco
+    Router1(config)# policy-map VLAN_PRIORITY
+    Router1(config-pmap)# class VLAN_1
+    Router1(config-pmap-c)# priority 100
+    Router1(config-pmap-c)# shape average 10000
+    Router1(config-pmap-c)# police 10000 10000 conform-action transmit exceed-action drop
+    Router1(config-pmap-c)# exit
+    Router1"
+Configure Router2 to apply traffic policing to limit outbound traffic on WAN interface.,"    ```
+    Router2# configure terminal
+    Router2(config)# interface FastEthernet0/0
+    Router2(config-if)# police rate 10000000 bps
+    Router2(config-if)# exit
+    Router2(config)#
+    ```"
+Implement Low Latency Queuing (LLQ) on Router3 for real-time application traffic.,"    ~~~Router3~~~~
+    interface FastEthernet0/0
+     service-policy input LLQ"
+Set up Router4 to throttle P2P traffic to prevent it from consuming excessive bandwidth.,"    ~~~Router4~~~~
+    class-map match-any p2p-traffic
+      match protocol p2p
+    policy-map throttle-p2p
+      class p2p-traffic
+        police rate 10000000 bps
+    interface FastEthernet0/0
+      service-policy input throttle-p2p"
+Configure Router1 to prioritize VoIP traffic based on DSCP markings.,"    ~~~Router1~~~~
+    ip cef
+    mpls traffic-eng
+    mpls ldp
+    mpls nhrp
+    mpls nhrp map 10.1.1.1 10.1.1.2
+    mpls nhrp network-id 10.1.1.0
+    mpls nhrp holdtime 300
+    mpls nhrp authentication cisco
+    mpls nhrp map-group 10.1.1.0
+    mpls nhrp map"
+Implement Weighted Random Early Detection (WRED) on Router2 to manage congestion.,"    ```
+    Router2# configure terminal
+    Router2(config)# interface FastEthernet0/0
+    Router2(config-if)# ip address 192.168.1.2 255.255.255.0
+    Router2(config-if)# ip pim sparse-mode
+    Router2(config-if)# ip pim sparse-mode
+    Router2(config-if)# ip pim sparse-mode
+    Router2(config-if)# ip pim sp"
+Configure Router3 to apply rate limiting on specific subnets.,"    ```
+    ~~~Router3~~~~
+    interface FastEthernet0/0
+     description ""Router3 - Subnet 10.1.1.0/24""
+     ip address 10.1.1.1 255.255.255.0
+     service-policy input RATE-LIMIT-SUBNET-10-1-1
+     exit
+
+    interface FastEthernet0/1
+     description ""Router3 - Subnet 10.1.2.0/24""
+     ip address 10.1.2.1 255"
+Allow HTTP traffic from LAN to WAN on Router1,"    ~~~Router1~~~~
+    interface FastEthernet0/0
+    ip address 192.168.1.1 255.255.255.0
+    ip http server
+    exit
+    ~~~Router2~~~~
+    interface FastEthernet0/0
+    ip address 192.168.2.1 255.255.255.0
+    ip http server
+    exit"
+Permit ICMP echo requests from Router3 LAN to Router2 LAN,"    ```
+    Router3# configure terminal
+    Router3(config)# ip access-list standard permit-icmp-echo-req
+    Router3(config-std-acl)# permit icmp any any echo
+    Router3(config-std-acl)# exit
+    Router3(config)# interface fastethernet 0/0
+    Router3(config-if)# ip access-group permit-icmp-echo-req in
+    Router3(config-if)# exit
+    ```
+    ```
+    Router2# configure terminal
+    Router2"
+Deny Telnet traffic from Router4 to any destination,"    ```
+    Router4# configure terminal
+    Router4(config)# ip access-list extended DENY_TELNET
+    Router4(config-ext-nacl)# deny tcp any any eq 23
+    Router4(config-ext-nacl)# exit
+    Router4(config)# interface serial 0/0
+    Router4(config-if)# ip access-group DENY_TELNET in
+    Router4(config-if)# exit
+    ```"
+Allow SSH traffic from Router2 LAN to Router1 LAN,"    ```
+    Router1# configure terminal
+    Router1(config)# ip access-list extended SSH-ALLOW
+    Router1(config-ext-nacl)# permit ip any any
+    Router1(config-ext-nacl)# exit
+    Router1(config)# interface fastethernet 0/0
+    Router1(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router1(config-if)# exit
+    Router1(config)#"
+Permit SNMP traffic from Management Network to all routers,"    ~~~mgmt_router~~~~
+    snmp-server enable traps
+    snmp-server host 10.1.1.100 version 2c
+    snmp-server community public
+    snmp-server group public v2c
+    snmp-server group public v3 auth md5 public
+    snmp-server group public v3 priv aes 128
+    snmp-server group public v3 priv aes 128
+    snmp-server group public v3 priv aes 128
+    snmp-server group public v3 priv a"
+Deny FTP traffic from Router1 to external networks,"    ```
+    Router1(config)# ip access-list extended DENY_FTP
+    Router1(config-ext-nacl)# deny ftp any any
+    Router1(config-ext-nacl)# exit
+    Router1(config)# interface fastethernet 0/0
+    Router1(config-if)# ip access-group DENY_FTP in
+    ```"
+Allow DNS traffic from LAN to WAN on Router3,"    ```
+    Router3# configure terminal
+    Router3(config)# ip access-list extended DNS_ALLOW
+    Router3(config-ext-nacl)# permit udp any any eq 53
+    Router3(config-ext-nacl)# exit
+    Router3(config)# interface FastEthernet0/0
+    Router3(config-if)# ip access-group DNS_ALLOW in
+    Router3(config-if)# exit
+    ```"
+Permit ICMP echo replies from WAN to LAN on Router4,"    ```cisco
+    Router4# configure terminal
+    Router4(config)# ip access-list extended WAN-to-LAN
+    Router4(config-ext-nacl)# permit icmp any any echo-reply
+    Router4(config-ext-nacl)# exit
+    Router4(config)# interface FastEthernet0/0
+    Router4(config-if)# ip access-group WAN-to-LAN in
+    Router4(config-if)# exit
+    ```"
+Deny UDP traffic on port 69 from LAN to WAN on Router2,"    ```
+    Router2# configure terminal
+    Router2(config)# access-list 101 deny udp any any eq 69
+    Router2(config)# interface fastethernet 0/1
+    Router2(config-if)# ip access-group 101 in
+    ```"
+Allow NTP traffic from Router4 to external time servers,"    ```cisco
+    Router4# configure terminal
+    Router4(config)# ip ntp server 10.1.1.1
+    Router4(config)# ip ntp server 10.1.1.2
+    Router4(config)# ip ntp server 10.1.1.3
+    Router4(config)# ip ntp server 10.1.1.4
+    Router4(config)# ip ntp authentication key 1
+    Router4(config)# ip ntp authentication mode md5
+    Router4(config)# ip n"
+Permit SMTP traffic from Router1 LAN to Router3 LAN,"    ```cisco
+    Router1# configure terminal
+    Router1(config)# ip access-list extended ALLOW_SMTP
+    Router1(config-ext-nacl)# permit tcp any any eq 25
+    Router1(config-ext-nacl)# exit
+    Router1(config)# interface fastethernet 0/1
+    Router1(config-if)# ip address 192.168.1.1 255.255.255.0"
+Deny SNMP traffic from WAN to LAN on Router2,"    ```cisco
+    Router2# configure terminal
+    Router2(config)# snmp-server host 192.168.1.100 deny
+    Router2(config)# exit
+    ```"
+Allow TFTP traffic from Router3 to Router4,"    ```
+    Router3# configure terminal
+    Router3(config)# ip access-list extended TFTP_ALLOW
+    Router3(config-ext-nacl)# permit udp any eq 69 Router4
+    Router3(config-ext-nacl)# exit
+    Router3(config)# interface FastEthernet0/0
+    Router3(config-if)# ip address 192.168.1.3 255.255.255.0
+    Router3(config-if)# exit
+"
+Permit HTTPS traffic from LAN to WAN on Router1,"
+    ~~~Router1~~~~
+    interface FastEthernet0/0
+    ip address 192.168.1.1 255.255.255.0
+    ip http server
+    ip http secure-server
+    exit
+    ~~~Router2~~~~
+    interface FastEthernet0/0
+    ip address 192.168.2.1 255.255.255.0
+    ip http server
+    ip http secure-server"
+Deny NetBIOS traffic from Router2 to Router1,"    ~~~Router1~~~~
+    ip access-list extended deny-netbios
+      deny ip any any netbios
+    !
+    access-group deny-netbios in
+    ~~~Router2~~~~
+    ip access-list extended deny-netbios
+      deny ip any any netbios
+    !
+    access-group deny-netbios in"
+Configure IP addresses on Router1 interfaces,"    ```
+    Router1# configure terminal
+    Router1(config)# interface FastEthernet0/0
+    Router1(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router1(config-if)# no shutdown
+    Router1(config-if)# exit
+    Router1(config)"
+Configure IP addresses on Router2 interfaces,"    ```
+    Router2# configure terminal
+    Router2(config)# interface FastEthernet0/0
+    Router2(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router2(config-if)# exit
+    Router2(config)# interface FastEthernet0/1
+    Router2"
+Configure IP addresses on Router3 interfaces,"    ```
+    Router3# configure terminal
+    Router3(config)# interface FastEthernet0/0
+    Router3(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router3(config-if)# no shutdown
+    Router3(config-if)# exit
+    Router3(config)"
+Configure IP addresses on Router4 interfaces,"    ```
+    Router4# configure terminal
+    Router4(config)# interface FastEthernet0/0
+    Router4(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router4(config-if)# no shutdown
+    Router4(config-if)# exit
+    Router4(config)"
+Enable interfaces giga0/0 on Router1 and Router3,"    ```
+    Router1# configure terminal
+    Router1(config)# interface gigabitethernet 0/0
+    Router1(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router1(config-if)# encapsulation dot1q 100
+    Router1(config-if)# exit
+    Router1#
+
+    Router3# configure terminal
+    Router3(config)# interface"
+Enable interfaces giga0/1 on Router1 and Router2,"    ```
+    Router1# configure terminal
+    Router1(config)# interface gigabitethernet 0/1
+    Router1(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router1(config-if)# encapsulation dot1q 100
+    Router1(config-if)# exit
+    Router1(config)#
+
+    Router2# configure terminal
+    Router2(config"
+Enable interfaces giga0/2 on Router1 and Router4,"    ```
+    Router1# configure terminal
+    Router1(config)# interface gigabitethernet "
+Enable interfaces giga0/0 on Router2 and Router4,"    ```
+    Router2# configure terminal
+    Router2(config)# interface gigabitethernet 0/0
+    Router2(config-if)# ip address 192.168.1.2 255.255.255.0
+    Router2(config-if)# encapsulation dot1q 100
+    Router2(config-if)# exit
+
+    Router4# configure terminal
+    Router4(config)# interface gigabitethernet "
+Enable interfaces giga0/1 on Router2 and Router1,"    ```
+    Router2# configure terminal
+    Router2(config)# interface gigabitethernet 0/1
+    Router2(config-if)# ip address 192.168.1.2 255.255.255.0
+    Router2(config-if)# bandwidth 1000000000
+    Router2(config-if)# exit
+    Router2(config)#
+
+"
+Enable interfaces giga0/2 on Router2 and Router3,"    ```
+    Router2# configure terminal
+    Router2(config)# interface gigabitethernet 0/2
+    Router2(config-if)# ip address 192.168.1.2 255.255.255.0
+    Router2(config-if)# no shutdown
+    Router2(config-if)# exit
+    Router2(config)# ip routing
+
+    Router3# configure terminal
+    Router3(config)# interface gigabitether"
+Enable interfaces giga0/0 on Router3 and Router4,"    ```
+    Router3# configure terminal
+    Router3(config)# interface gigabitethernet 0/0
+    Router3(config-if)# ip address 192.168.1.3 255.255.255.0
+    Router3(config-"
+Enable interfaces giga0/1 on Router3 and Router2,"    ```
+    Router3# configure terminal
+    Router3(config)# interface GigabitEthernet0/1
+    Router3(config-if)# ip address 192.168.1.3 255.255.255.0
+    Router3(config-if)# bandwidth 1000000000
+    Router3(config-if)# exit
+
+    Router2# configure terminal
+"
+Enable interfaces giga0/2 on Router3 and Router1,"    ```
+    Router3# configure terminal
+    Router3(config)# interface gigabitethernet 0/2
+    Router3(config-if)# ip address 10.1.1.100 255.255."
+Enable interfaces giga0/0 on Router4 and Router2,"    ```
+    Router4# configure terminal
+    Router4(config)# interface gigabitethernet 0/0
+    Router4(config-if)# ip address 10.1.1.4 255.255.255.0
+    Router4(config-if)# bandwidth 1000000000
+    Router4(config-if)# exit
+    Router4#
+
+    Router2# configure"
+Enable interfaces giga0/1 on Router4 and Router3,"    ```
+    Router4# configure terminal
+    Router4(config)# interface gigabitethernet 0/1
+    Router4(config-if)# ip address 10.1.1.4 255.255.255.0
+    Router4(config-if)# bandwidth 1000000000
+    Router3# configure terminal
+    Router3(config)# interface gigabitethernet 0/"
+Enable interfaces giga0/2 on Router4 and Router1,"    ```
+    Router4# configure terminal
+    Router4(config)# interface gigabitethernet 0/2
+    Router4(config-if)# ip address 192.168.1.100 255.255.255.0
+    Router4(config-if)# no shutdown
+    Router4(config-if)# exit
+    Router4(config)# ip routing
+
+    Router10# configure terminal
+    Router10(config)#"
+Configure routing protocol between Router1 and Router2,"    ```
+    Router1# configure terminal
+    Router1(config)# router ospfv3 1
+    Router1(config-router)# network 10.1.1.0/24 area 0
+    Router1(config-router"
+Configure routing protocol between Router1 and Router3,"    ```
+    Router1# configure terminal
+    Router1(config)# router ospfv3 1
+    Router1(config-router)# network 192.168.1.0/24 area 0
+    Router1(config-router)# cost 10
+    Router1(config-router"
+Configure routing protocol between Router1 and Router4,"    ```
+    Router1# configure terminal
+    Router1(config)# router ospfv3 1
+    Router1(config-router)# area 0
+    Router1(config-router)# interface Ethernet0/0
+    Router1(config-if)# ipv6 address 2001:DB8:1::1/64
+    Router1(config-if)# ipv6 ospf 1 area 0
+    Router1(config-if)# exit
+    R"
+Configure routing protocol between Router2 and Router4,"    ```
+    Router2# configure terminal
+    Router2(config)# router ospfv3 1
+    Router2(config-router)# network 192.168.1.0/24 area 0
+    Router2(config-router)# priority 100
+   "
+Configure routing protocol between Router2 and Router3,"    ```
+    Router2# configure terminal
+    Router2(config)# router ospfv3 1
+    Router2(config-router)# network 2001:db8:12"
+Configure routing protocol between Router3 and Router4,"    ```cisco
+    Router3# configure terminal
+    Router3(config)# router ospfv3 1
+    Router3(config-router)# area 0
+    Router3(config-router)# interface Ethernet 0/0
+    Router3(config-if)# ipv6 address 2001:DB8:1::1/64"
+Configure static route on Router1 for network 50.0.0.0/24,"
+    ```cisco
+    Router1# configure terminal
+    Router1(config)# ip route 50.0.0.0 255.255.0.0 10.1.1.1
+    ```"
+Configure static route on Router2 for network 30.0.0.0/24,"    ```
+    Router2# configure terminal
+    Router2(config)# ip route 30.0.0.0 255.255.0.0 192.168.1.1
+    ```"
+Configure static route on Router3 for network 40.0.0.0/24,"    ~~~Router3~~~~
+    Router3# configure terminal
+    Router3(config)# ip route 40.0.0.0 25"
+Configure static route on Router4 for network 20.0.0.0/24,"    ```
+    Router4(config)# ip route 20.0.0.0 255.255.255.0 192.168.1.1
+    ```"
+Allow ICMP traffic from Router1 to Router4,"    ```
+    Router1# configure terminal
+    Router1(config)# ip access-list extended ICMP-ALLOW
+    Router1(config-ext-nacl)# permit icmp any Router4
+    Router1(config-ext-nacl)# exit
+    Router1(config)# ip access-list extended ICMP-DENY
+    Router1(config-ext-nacl)# deny icmp any any
+    Router1(config-ext-nacl)# exit
+    Router1(config)# ip access-group ICMP-"
+Permit SNMP traps from Router3 to Management Network,"    ```cisco
+    Router3# configure terminal
+    Router3(config)# snmp-server enable traps
+    Router3(config)# snmp-server host 10.1.1.0 161
+    Router3(config)# snmp-server trap-source Loopback0
+    Router3(config)# snmp-server trap-group 10.1.1.0
+    Router3(config)# exit
+    ```"
+Deny Telnet traffic from WAN to LAN on Router4,"
+    ```
+    Router4(config)# access-list 101 deny tcp any any eq 23
+    Router4(config)# interface FastEthernet0/0
+    Router4(config-if)# ip access-group 101 in
+    ```"
+Allow SSH traffic from WAN to Router3,"    ```
+    Router3# configure terminal
+    Router3(config)# ip ssh source-interface WAN
+    Router3(config)# exit
+
+    Router4# configure terminal
+    Router4(config)# ip ssh source-interface WAN
+    Router4(config)# exit
+
+    Router1# configure terminal
+    Router1(config)# ip ssh source-interface LAN
+    Router1(config)# exit
+
+    Router2# configure terminal
+    Router2(config)# ip ssh"
+Permit HTTP traffic from Router2 to Router1,"    ```
+    Router1# configure terminal
+    Router1(config)# ip access-list extended HTTP_ALLOW
+    Router1(config-ext-nacl)# permit tcp any any eq 80
+    Router1(config-ext-nacl)# exit
+    Router1(config)# interface fastethernet 0/1
+    Router1(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router1(config-if)# exit
+    Router1"
+Deny ICMP traffic from Router4 to Router2,"
+    ~~~Router4~~~~
+    access-list 101 deny icmp any any
+    ~~~Router2~~~~
+    access-list 101 permit icmp any any"
+Allow FTP traffic from LAN to WAN on Router2,"    ```
+    Router2# configure terminal
+    Router2(config)# ip access-list extended FTP_ALLOW
+    Router2(config-ext-nacl)# permit tcp any 192.168.1.0 0.0.0.255 eq 21
+    Router2(config-ext-nacl)# permit tcp any 10.0.0.0 0.0.0.255 eq 21
+    Router2(config-ext-nacl)# deny ip any any"
+Permit ICMP traffic from WAN to LAN on Router1,"    ```
+    Router1# configure terminal
+    Router1(config)# ip access-list standard WAN_to_LAN
+    Router1(config-std-acl)# permit icmp any any
+    Router1(config-std-acl)# exit
+    Router1(config)# interface FastEthernet0/0
+    Router1(config-if)# ip access-group WAN_to_LAN in
+    Router1(config-if)# exit
+    ```"
+Deny DNS traffic from Router1 LAN to Router2 LAN,"
+   ```cisco
+    ~~~Router1~~~~
+    ip access-list extended DENY_DNS
+      deny udp any any eq domain
+    !
+    interface fastethernet 0/0
+      ip address 192.168.1.1 255.255.255.0
+      ip access-group DENY_DNS in
+    !
+    ~~~Router2~~~~
+    ip access-list extended DENY_DNS
+      deny udp any any eq domain
+    !
+    interface fastethernet 0/0
+      ip address"
+Allow SMTP traffic from LAN to WAN on Router4,"    ```
+    Router4# configure terminal
+    Router4(config)# interface FastEthernet0/0
+    Router4(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router4(config-if)# ip access-list extended ALLOW_SMTP
+    Router4(config-if-acl)# permit tcp any any eq 25
+    Router4(config-if-acl)# exit
+    Router4(config-if)# ip access-group ALLOW_SM"
+Permit SSH traffic from Management Network to all routers,"    ```
+    Router(config)# ip ssh management-network
+    Router(config)# ip ssh permit-from management-network
+    Router(config)# ip ssh permit-to all
+    ```"
