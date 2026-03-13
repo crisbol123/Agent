@@ -4,8 +4,8 @@ import pandas as pd
 print("Cargando dataset con ground truth...")
 df = pd.read_csv("dataset_classified_ground_truth.csv")
 
-# Definir las categorías
-CATEGORIES = ['DIAG', 'QoS', 'RP', 'TN', 'INF', 'MNG', 'PKI', 'ACL', 'OTHERS']
+# Definir las categorías (sin OTHERS - no aporta valor técnico)
+CATEGORIES = ['DIAG', 'QoS', 'RP', 'TN', 'INF', 'MNG', 'PKI', 'ACL']
 
 def create_balanced_sample(df, samples_per_category=100):
     """

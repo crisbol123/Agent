@@ -15,8 +15,8 @@ if not os.path.exists(BALANCED_DATASET_FILE):
         "ERROR: Dataset balanceado no encontrado!\n\n"
         "Por favor ejecuta primero el siguiente comando:\n"
         "    python create_balanced_dataset.py\n\n"
-        "Esto generará 'dataset_balanced_evaluation.csv' con 900 muestras\n"
-        "(100 por categoría) necesarias para una comparación justa.\n"
+        "Esto generará 'dataset_balanced_evaluation.csv' con 800 muestras\n"
+        "(100 por categoría, 8 categorías técnicas) necesarias para una comparación justa.\n"
         + "="*70
     )
 
@@ -24,8 +24,8 @@ if not os.path.exists(BALANCED_DATASET_FILE):
 print("Cargando dataset balanceado para evaluación...")
 df = pd.read_csv(BALANCED_DATASET_FILE)
 
-# Definir las categorías
-CATEGORIES = ['DIAG', 'QoS', 'RP', 'TN', 'INF', 'MNG', 'PKI', 'ACL', 'OTHERS']
+# Definir las categorías (sin OTHERS - no aporta valor técnico)
+CATEGORIES = ['DIAG', 'QoS', 'RP', 'TN', 'INF', 'MNG', 'PKI', 'ACL']
 
 # Configuración de modelos a evaluar
 MODELS = {
@@ -63,7 +63,6 @@ Categories:
 - MNG: Management and Monitoring (SNMP, NetFlow, IP SLA)
 - PKI: Security and PKI (certificates, AAA, RADIUS)
 - ACL: Access Control Lists and Security
-- OTHERS: Other configurations
 
 Question: {question}
 Answer: {answer}
@@ -96,7 +95,7 @@ def classify_with_slm(question, answer, tokenizer, model):
     Clasifica una pregunta-respuesta usando un SLM
     """
     try:
-        prompt = CLASSIFICATION_PROMPT.format(question=question, answer=answer[:2000])  # Limitar tamaño
+        prompt = CLASSIFICATION_PROMPT.format(question=question, answer=answer)  # Sin límite
         
         inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
         outputs = model.generate(
@@ -116,11 +115,11 @@ def classify_with_slm(question, answer, tokenizer, model):
             if cat in response:
                 return cat
         
-        return 'OTHERS'  # Default si no se reconoce
+        return 'DIAG'  # Default si no se reconoce
         
     except Exception as e:
         print(f"Error en clasificación: {e}")
-        return 'OTHERS'
+        return 'DIAG'
 
 def evaluate_model(model_name, model_config, df_sample):
     """
