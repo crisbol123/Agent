@@ -25,7 +25,7 @@ print("Cargando dataset balanceado para evaluación...")
 df = pd.read_csv(BALANCED_DATASET_FILE)
 
 # Definir las categorías (sin OTHERS - no aporta valor técnico)
-CATEGORIES = ['DIAG', 'QoS', 'RP', 'TN', 'INF', 'MNG', 'PKI', 'ACL']
+CATEGORIES = ['DIAG', 'QOS', 'RP', 'TN', 'INF', 'MNG', 'PKI', 'ACL']
 
 # Configuración de modelos a evaluar
 MODELS = {
@@ -45,81 +45,108 @@ MODELS = {
         'path': '01-ai/Yi-6B-Chat',
         'params': '6B'
     },
-    'DeciLM-7B-Instruct': {
-        'path': 'Deci/DeciLM-7B-instruct',
+    'Mistral-7B-Instruct': {
+        'path': 'mistralai/Mistral-7B-Instruct-v0.3',
         'params': '7B'
     }
 }
 
 # Prompt template para clasificación
-CLASSIFICATION_PROMPT = """You are a network configuration expert. Classify the following Cisco IOS configuration into ONE of these categories:
+CLASSIFICATION_PROMPT = """You are a Cisco networking expert.
 
-Categories:
-- DIAG: Diagnostic and operational commands (show, display, enable)
-- QoS: Quality of Service configurations
-- RP: Routing Protocols (OSPF, BGP, EIGRP, etc.)
-- TN: Tunnels and VPN (IPsec, GRE, etc.)
-- INF: Infrastructure (interfaces, VLANs, NAT)
-- MNG: Management and Monitoring (SNMP, NetFlow, IP SLA)
-- PKI: Security and PKI (certificates, AAA, RADIUS)
-- ACL: Access Control Lists and Security
+Classify the following Cisco IOS question into ONE category.
 
-Question: {question}
-Answer: {answer}
+Return ONLY the category label from this list:
 
-Respond with ONLY the category name (e.g., "DIAG" or "QoS"). No explanation needed."""
+DIAG
+QOS
+RP
+TN
+INF
+MNG
+PKI
+ACL
+
+Rules:
+- Output ONLY the label
+- Do NOT explain
+- Do NOT write sentences
+- Do NOT output anything else
+
+Question:
+{question}
+
+Label:"""
 
 def load_model(model_name, model_config):
-    """
-    Carga un modelo SLM usando transformers
-    """
     try:
         from transformers import AutoTokenizer, AutoModelForCausalLM
         import torch
         
-        print(f"\nCargando {model_name}...")
-        tokenizer = AutoTokenizer.from_pretrained(model_config['path'])
+        if not torch.cuda.is_available():
+            raise RuntimeError(
+                "\nERROR: CUDA no disponible. Verifica que:\n"
+                "  1. Tienes instalado PyTorch con soporte CUDA:\n"
+                "     pip install torch --index-url https://download.pytorch.org/whl/cu124\n"
+                "  2. Los drivers de NVIDIA están actualizados\n"
+                "  3. Ejecuta: nvidia-smi para verificar la GPU"
+            )
+        
+        device = torch.device("cuda:0")
+        print(f"\nCargando {model_name} en {torch.cuda.get_device_name(0)}...")
+        
+        tokenizer = AutoTokenizer.from_pretrained(model_config['path'], trust_remote_code=model_config.get('trust_remote_code', False))
         model = AutoModelForCausalLM.from_pretrained(
             model_config['path'],
-            torch_dtype=torch.float16,
-            device_map="auto"
+            dtype=torch.float16,
+            device_map="cuda:0",
+            trust_remote_code=model_config.get('trust_remote_code', False)
         )
-        print(f"Modelo {model_name} cargado exitosamente")
+        print(f"  VRAM usada: {torch.cuda.memory_allocated(0)/1024**3:.2f} GB")
+        print(f"  Modelo {model_name} cargado exitosamente en GPU")
         return tokenizer, model
     except Exception as e:
         print(f"Error cargando {model_name}: {e}")
         return None, None
 
 def classify_with_slm(question, answer, tokenizer, model):
-    """
-    Clasifica una pregunta-respuesta usando un SLM
-    """
     try:
-        prompt = CLASSIFICATION_PROMPT.format(question=question, answer=answer)  # Sin límite
+        messages = [
+            {
+                "role": "user",
+                "content": CLASSIFICATION_PROMPT.format(question=question)
+            }
+        ]
+        prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048).to("cuda:0")
         
-        inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
         outputs = model.generate(
             **inputs,
-            max_new_tokens=10,
-            temperature=0.1,
-            do_sample=False
+            max_new_tokens=15,
+            do_sample=False,
+            pad_token_id=tokenizer.eos_token_id
         )
         
-        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        
-        # Extraer solo la categoría de la respuesta
-        response = response.split(prompt)[-1].strip().upper()
-        
-        # Validar que sea una categoría válida
+        raw = tokenizer.decode(
+         outputs[0][inputs['input_ids'].shape[1]:],
+         skip_special_tokens=True
+        ).strip().upper()
+
+# Buscar categoría al inicio
         for cat in CATEGORIES:
-            if cat in response:
-                return cat
-        
-        return 'DIAG'  # Default si no se reconoce
+           if raw.startswith(cat):
+             return cat
+
+# Buscar categoría en cualquier parte del texto
+        for cat in CATEGORIES:
+            if cat in raw:
+              return cat
+
+        return 'UNKNOWN'
         
     except Exception as e:
         print(f"Error en clasificación: {e}")
-        return 'DIAG'
+        return 'UNKNOWN'
 
 def evaluate_model(model_name, model_config, df_sample):
     """
@@ -150,16 +177,20 @@ def evaluate_model(model_name, model_config, df_sample):
     elapsed_time = time.time() - start_time
     
     # Calcular métricas
-    y_true = df_sample['ground_truth_category'].tolist()
+    y_true = [cat.upper() for cat in df_sample['ground_truth_category'].tolist()]
     y_pred = predictions
     
+    unknown_count = predictions.count('UNKNOWN')
+    if unknown_count > 0:
+        print(f"  Advertencia: {unknown_count} muestras sin categoría detectada (UNKNOWN)")
+
     accuracy = accuracy_score(y_true, y_pred)
     precision, recall, f1, support = precision_recall_fscore_support(
-        y_true, y_pred, average='weighted', zero_division=0
+        y_true, y_pred, average='weighted', zero_division=0, labels=CATEGORIES
     )
-    
+
     # Reporte detallado
-    report = classification_report(y_true, y_pred, target_names=CATEGORIES, zero_division=0)
+    report = classification_report(y_true, y_pred, labels=CATEGORIES, target_names=CATEGORIES, zero_division=0)
     conf_matrix = confusion_matrix(y_true, y_pred, labels=CATEGORIES)
     
     results = {
@@ -207,6 +238,12 @@ def main():
         result = evaluate_model(model_name, model_config, df)
         if result:
             all_results.append(result)
+        
+        # Liberar VRAM entre modelos
+        import gc, torch
+        gc.collect()
+        torch.cuda.empty_cache()
+        print(f"VRAM liberada. Libre: {torch.cuda.memory_reserved(0)/1024**3:.2f} GB")
     
     # Guardar resultados
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
