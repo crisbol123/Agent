@@ -1,0 +1,262 @@
+id,question,answer,category
+1552,"What type of authentication do we need to implement on neighbor routers in routing updates, considering security concerns?","To ensure secure key exchange between neighbor routers in routing updates, we need to implement Key-based authentication.
+
+Cisco IOS Code:
+neighbor ip-addr authenticaton md5 [message-digest hash]
+
+Example:
+```
+router(config-router)#neighbor 192.168.1.100 authentication md5
+router(config-router)#neighbor 192.168.1.101 authentication message-digest hash
+```",SECURITY
+23,How can I configure the percentile option for IP SLAs operations?,"To configure the percentile option for IP SLAs operations, you can use the ""show ip sla configuration"" command to display configuration values and defaults for all IP SLAs operations or a specified operation. To do this, follow these steps:
+
+Router# show ip sla configuration
+
+This will display the current configuration of your IP SLAs operations.
+
+To configure the percentile option, you need to specify the percentile value as an argument to the ""ip sla operation-profile"" command. The syntax for this command is:
+
+Router(config)# ip sla operation-profile <operation-name> percentile <percentile-value>
+
+For example:
+
+Router(config)# ip sla operation-profile my-op percentile 90
+
+This sets the percentile value to 90 for the IP SLAs operation named ""my-op"".
+
+Note that you can also use the ""show ip sla configuration"" command to verify the configured percentile value.
+
+**Example:**
+
+Router# show ip sla configuration
+Operation profile: my-op
+Percentile: 90
+
+In this example, the percentile value is set to 90 for the IP SLAs operation named ""my-op"".",MONITORING
+252,What is the primary purpose of configuring NAT in an IP network?,"The primary purpose of configuring NAT (Network Address Translation) is to enable private IP internetworks that use non-registered IP addresses to connect to the Internet, while conserving global IP address space. As per the configuration, NAT translates private addresses in the internal network into legal addresses and can be configured to advertise only one address to the outside world, effectively hiding the entire internal network behind that one address.
+
+Example Cisco IOS command:
+
+ip nat inside source static 192.168.1.0 198.51.100.1
+
+This command configures a static NAT translation from private IP address 192.168.1.0 in the internal network to public IP address 198.51.100.1 on the Internet.",GENERAL
+2698,What is the TCP connection timeout period set in this configuration?,"In this configuration, the TCP connection timeout period is set to 30 seconds with the command `tcp synwait-time 30`. This means that any SYN packets that are received by the router will be held in the queue for a maximum of 30 seconds before being timed out.
+
+Example Cisco IOS code:
+```
+Router(config)# tcp synwait-time 30
+```",MONITORING
+3995,How can we monitor and classify traffic by the published application name using Server Browser Mode on the master browser?,"To monitor and classify traffic by the published application name, you can use NBAR (Network Based Application Recognition) with the following configuration:
+```
+match protocol citrix app <application-name-string>
+```
+This command uses a regular expression search on the packet contents to identify traffic related to the specified application. The `app` keyword is used to specify the application name, and the `<application-name-string>` argument should be replaced with the actual application name you want to monitor.
+
+Example:
+```
+match protocol citrix app ""Citrix HDX""
+```
+This configuration will allow NBAR to track and monitor traffic related to Citrix HDX applications.",MONITORING
+3547,What is the command sequence to replace MQC Command Sequence with MQC traffic shaping for non-FECN/BECN in Cisco IOS?,"To replace MQC Command Sequence with MQC traffic shaping for non-FECN/BECN, you can use the following command sequence:
+
+Router(config)# policy-map policy-map-name
+Router(config-pmap)# class class-default
+Router(config-pmap-c)# shape average 10000
+
+In this example, ""policy-map"" is the name of the policy map, ""class-default"" is the default class within the policy map, and ""shape average 10000"" sets the traffic shaping rate to an average of 10,000 kilobits per second.
+
+Note: The actual command sequence may vary depending on your specific network configuration.",QOS
+1117,What steps can you take to configure VXLAN HA on multicast mode for VXLAN-MCLAG active-active high availability support?,"To configure VXLAN HA on multicast mode for VXLAN-MCLAG active-active high availability support, follow these steps:
+
+1. Enable multicast routing with the command:
+```
+Router(config)# ip multicast-routing distributed
+```
+
+2. Enable PIM bidirectional mode with the command:
+```
+Router(config)# ip pim bidir-enable
+```
+
+3. Set the PIM rendezvous point (RP) address with the command:
+```
+Router(config)# ip pim rp-address 4.4.4.4 bidir
+```
+
+4. Configure redundancy mode with the command:
+```
+Router(config)# redundancy mode sso
+```
+
+5. Define interchassis group with the command:
+```
+Router(config)# interchassis group 1
+```
+
+6. Enable Bidirectional Forwarding Detection (BFD) with the command:
+```
+Router(config)# monitor peer bfd
+```
+
+7. Set MLAG system priority with the command:
+```
+Router(config)# mlacp system-priority 200
+```
+
+8. Define MLAG node ID with the command:
+```
+Router(config)# mlacp node-id 0
+```
+
+9. Configure bridge domains and VXLANs with appropriate member interfaces and service instances.
+
+Note: These commands are specific to Cisco IOS devices, and the exact syntax may vary depending on the platform and software version being used.",CONNECTIVITY
+1366,What is the IP address of the management station that will receive SNMP traps?,"According to the configuration `snmp-server host 224.1.0.1 traps public`, the IP address of the management station is **224.1.0.1**.",MONITORING
+2699,How can I display VRF-level policy firewall statistics?,"To display VRF-level policy firewall statistics, you can use the command `show policy-firewall stats vrf [vrf-pmap-name]`. For example:
+```
+Router# show policy-firewall stats vrf blue
+```",MONITORING
+1860,"How do you configure PfRv3 on the hub-border router with the source interface, IP address of the hub-master controller, and the path name on external interfaces?","```
+Router> enable
+Router# configure terminal
+Router(config)# source-interface loopback 0
+Router(config)# master ip 192.168.1.1 local
+Router(config)# exit
+Router# exit
+Router> exit
+
+Router# interface tunnel-name
+Router(config-if)# ip address 10.1.1.2 255.255.255.0
+Router(config-if)#
+
+Router(config)# vrf VRF-NAME border
+Router(config-vrf)#
+Router(config-vrf)# domain HUB-DOMAIN path PATH-NAME
+Router(config-vrf)#
+```
+
+Note: Replace `HUB-DOMAIN` and `PATH-NAME` with the actual values required for your specific configuration.",QOS
+4320,What happens when none of the routers in the network have any interested receivers for a given multicast group address?,"When none of the routers in the network have any interested receivers for a given multicast group address, such as (192.168.1.2, 232.1.1.1), PIM-SSM will not create state for that multicast group. This is because the ip pim ssm default command configured globally on all routers ensures that no router will assume responsibility to join or maintain state for a given multicast group unless there are interested receivers in the network.
+
+In other words, when there are no receivers interested in receiving traffic for a particular multicast group, PIM-SSM will not create any forwarding state for that group. This is achieved through the use of the ip pim ssm default command, which disables the creation of sparse-mode tree state unless there are interested receivers in the network.
+
+```
+Router(config)# do show ip pim ssm
+PIM SSM Mapping:
+  Default mapping enabled
+```",ROUTING
+3475,How can we configure a priority entry for scheduling in an ASR 1000 Series Aggregation Services Router?,"To configure a priority entry for scheduling in an ASR 1000 Series Aggregation Services Router, you can use the `priority` command. Here's an example of how to do it:
+
+```
+Router(config)# schedule
+Router(config-sch-map)# priority 
+   min-burst 1000
+   max-rate 50000
+   excess-weight 10
+   threshold 50
+exit
+```
+
+In this example, the `priority` command is used to create a priority entry with a minimum burst size of 1000 bytes, maximum rate of 50,000 bits per second, and an excess weight of 10. The threshold value is set to 50.
+
+This configuration will prioritize traffic based on its priority level, giving higher-priority traffic preferential treatment in the scheduling process.",QOS
+3646,How can we configure the policer to take into account network congestion and mark packets differently for conforming and exceeding traffic?,"To achieve this, we can use a combination of policing and marking features in Cisco IOS. Here's an example configuration:
+```cisco
+Router(config)# class-map match-any congested-traffic
+Router(config-class-map)# police 10000 3000 exceed-action drop
+Router(config-class-map)# police-conform-action mark-down dscp 8
+Router(config-class-map)# exit
+
+Router(config)# policy-map congestion-control
+Router(config-pmap)# class congested-traffic
+Router(config-pmap-c)# set-dscp-transmit 8
+
+Router(config-pmap-c)# exit
+
+Router(config-pmap)# exit
+
+Router(config)# interface fastethernet 0/1
+Router(config-if)# service-policy input congestion-control
+```
+In this configuration:
+
+* We define a class map `congested-traffic` that matches traffic that is congested.
+* The police command sets the policer to drop packets that exceed the configured rate of 10,000 kbps with a burst size of 3,000 kbps.
+* The police-conform-action command marks conforming packets with a DSCP value of 8.
+* We define a policy map `congestion-control` that applies the policing and marking actions to traffic matching the class map.
+* On the interface, we apply the service-policy input to enforce the congestion control policy.
+
+This configuration ensures that traffic that exceeds the policer's rate is dropped, while conforming traffic is marked with a DSCP value of 8.",QOS
+4224,What configuration command would you use to define an ISAKMP profile and audit IPsec user sessions?,"To define an ISAKMP profile and audit IPsec user sessions, you would use the following configuration command:
+
+crypto isakmp profile profile-name [accounting aaalist]
+
+For example:
+
+Router(config)# crypto isakmp profile MY_PROFILE [accounting aaa-list]
+
+This command defines a new ISAKMP profile named ""MY_PROFILE"" that audits IPsec user sessions using AAA accounting.",SECURITY
+3288,How can we enable Bidirectional Forwarding Detection (BFD) on an interface in Cisco IOS?,"To enable BFD on the interface, you can use the following command:
+```
+Device(config-if)# bfd interval 50 min_rx 50 multiplier 5
+```
+This command sets the BFD interval to 50 milliseconds, the minimum receive interval to 50 milliseconds, and the multiplier to 5.",ROUTING
+2770,What is the purpose of commands 1 and 2 in configuring a class map for internet traffic and a policy map for private internet policy with stateful packet inspection?,"Command 1: ""Device(config)# class-map type inspect match-any internet-traffic-class""
+
+This command configures a class map named ""internet-traffic-class"" that matches any packets matching the specified criteria. The ""match-any"" option allows the class map to match packets based on any of the specified conditions.
+
+Command 2: ""Device(config)# policy-map type inspect private-internet-policy""
+
+This command configures a policy map named ""private-internet-policy"" that applies stateful packet inspection to traffic matching the ""internet-traffic-class"" class map. This policy map will apply specific actions, such as firewall rules or quality of service (QoS) settings, to packets matching this class.
+
+Example code:
+```
+Device(config)# class-map type inspect match-any internet-traffic-class
+  match any
+
+Device(config)# policy-map type inspect private-internet-policy
+  class internet-traffic-class
+    inspect pmap-fw
+```",QOS
+4140,What are the two new RADIUS attributes introduced by the RADIUS Tunnel Attribute Extensions feature on the Cisco ASR 1000 Series Aggregation Services Routers?,"The RADIUS Tunnel Attribute Extensions feature introduces RADIUS attribute 90 (Tunnel-Client-Auth-ID) and RADIUS attribute 91 (Tunnel-Server-Auth-ID). These attributes help support the provision of compulsory tunneling in virtual private networks (VPNs) by allowing the user to specify authentication names for the network access server (NAS) and the RADIUS server.
+
+Example Cisco IOS code:
+```
+radius-server host 1.1.1.1 auth-port 1812 acct-port 1813
+!
+radius-server key my_secret_key
+!
+radius-server attribute 90 Tunnel-Client-Auth-ID
+radius-server attribute 91 Tunnel-Server-Auth-ID
+```",SECURITY
+1589,How can you secure Telnet sessions for router configuration?,"To secure Telnet sessions for router configuration, you can use the AAA (Authentication, Authorization, and Accounting) feature of Cisco IOS. Specifically, you can configure AAA authentication to require a username and password before allowing access to the router's command-line interface (CLI).
+
+Using the configuration ""aaa authentication login default enable"", you can achieve this level of security for your Telnet sessions.
+
+Here's an example of how you might configure this in Cisco IOS:
+```
+aaa new-model
+aaa authentication login default enable
+ip telnet server
+!
+line vty 0 4
+transport input none
+login local
+!
+telnet server v2
+!
+```
+This configuration enables AAA authentication for login and sets the Telnet server to require a username and password. The ""transport input none"" command disables the use of any transport protocols other than Telnet, and the ""login local"" command specifies that users must log in using their local usernames and passwords.",SECURITY
+3425,What command is used to configure a VRF table and enter VRF configuration mode?,"Router(config)# ip vrf [vrf-name]
+
+For example: Router(config)# ip vrf cisco (as shown in the given configuration)
+
+This will allow you to create a routing and forwarding table for a VRF instance.",ROUTING
+759,How can we ensure that non-OAM PDU frames are not sent to the CPU for software processing when two connected ports are in a loopback session?,"To achieve this requirement, you can use the ""oam pdp disable"" command under the loopback session configuration on Cisco devices. This command disables the reception of non-OAM PDUs at the MAC level, which ensures that no frames other than OAM PDUs are sent to the CPU for software processing.
+
+Example:
+Router(config)# loopback 1
+Router(config-loopback)# oam pdp disable
+
+This configuration will prevent non-OAM PDU frames from being processed by the CPU and instead loop them back at the MAC level or discard them, depending on the specific implementation.",SECURITY

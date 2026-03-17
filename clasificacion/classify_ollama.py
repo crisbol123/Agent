@@ -10,16 +10,18 @@ Requisitos:
 Uso:
     python classify_ollama.py                  # dataset completo
     python classify_ollama.py --sample 50      # prueba rápida
-    python classify_ollama.py --model deepseek-r1:8b  # modelo por defecto
+    python classify_ollama.py --model qwen2.5:14b
 """
 
 import re
 import json
-import time
 import argparse
 import pandas as pd
 from pathlib import Path
-from collections import Counter
+from typing import Any
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 try:
     import ollama
@@ -57,12 +59,9 @@ Rules:
 
 Response format:
 ```json
-{{"category": "CATEGORY_NAME", "reason": "one short sentence"}}
+{{"category": "CATEGORY_NAME"}}
 ```"""
 
-
-
-CONFIDENCE_THRESHOLD = 0.70
 
 
 # ---------------------------------------------------------------------------
@@ -92,21 +91,23 @@ def parse_json_from_response(text: str) -> dict | None:
     return None
 
 
-def compute_confidence( category: str, all_votes: list[str]) -> float:
-    if not all_votes:
-        return 0.0
-    counter = Counter(all_votes)
-    winner_count = counter[category]
-    return round(winner_count / len(all_votes), 2)
+def build_run_checkpoint_path(base_path: str, model: str, input_path: str, sample: int | None) -> Path:
+    base = Path(base_path)
+    sample_tag = f"sample{sample}" if sample else "full"
+    model_tag = re.sub(r"[^a-zA-Z0-9]+", "_", model).strip("_")
+    input_tag = re.sub(r"[^a-zA-Z0-9]+", "_", Path(input_path).stem).strip("_")
+    run_tag = f"{input_tag}_{model_tag}_{sample_tag}".lower()
+    return base.with_name(f"{base.stem}_{run_tag}{base.suffix}")
+
 
 # ---------------------------------------------------------------------------
 # Clasificador
 # ---------------------------------------------------------------------------
 
-def single_call(model: str, question: str) -> tuple[str | None, str]:
+def single_call(model: str, question: str) -> str | None:
     """
     Una llamada al modelo.
-    Retorna (category, reason).
+    Retorna category.
     """
     try:
         response = ollama.chat(
@@ -116,71 +117,41 @@ def single_call(model: str, question: str) -> tuple[str | None, str]:
                 {"role": "user",   "content": question},
             ],
             options={
-                "temperature": 0.7,
-                "num_predict": 2048,
+                "temperature": 0.0,
+                "num_predict": 128,
             },
         )
         raw = response["message"]["content"]
-        print(f"\n--- QUESTION ---\n{question}\n--- RAW RESPONSE ---\n{raw}\n--- END ---\n")
+        print(f"\n--- MODEL ---\n{model}\n--- QUESTION ---\n{question}\n--- RAW RESPONSE ---\n{raw}\n--- END ---\n")
         parsed = parse_json_from_response(raw)
 
         if parsed and parsed.get("category") in CAT_LIST:
-            return parsed["category"], parsed.get("reason", "")
+            return parsed["category"]
 
         for cat in CAT_LIST:
             if cat in raw.upper():
-                return cat, "Extracted from response text"
+                return cat
 
         print(f"\n  [WARN] No se pudo parsear. Raw: {repr(raw[:200])}")
-        return None, ""
+        return None
 
     except Exception as e:
         print(f"\n  Error en llamada: {e}")
-        return None, ""
+        return None
 
     
 
+def classify_question(model: str, question: str) -> dict:
 
-def classify_question(model: str, question: str, n_votes: int = 2) -> dict:
-  
-    votes = []
-    reasons = []
-    
+    category = single_call(model, question)
 
-    for _ in range(n_votes):
-        cat, reason = single_call(model, question)
-        if cat:
-            votes.append(cat)
-            reasons.append(reason)
-            
-
-    if not votes:
+    if not category:
         return {
             "category": "UNKNOWN",
-            "confidence": 0.0,
-            "reason": "All calls failed",
-            "votes": [],
-            "low_confidence": True,
         }
 
-    # Categoría ganadora
-    counter = Counter(votes)
-    winner, _ = counter.most_common(1)[0]
-
- 
-    winning_reason = next(
-        (r for v, r in zip(votes, reasons) if v == winner), reasons[0]
-    )
-
-    confidence = compute_confidence(winner, votes)
-    low_conf = confidence < CONFIDENCE_THRESHOLD
-
     return {
-        "category": winner,
-        "confidence": confidence,
-        "reason": winning_reason,
-        "votes": votes,
-        "low_confidence": low_conf,
+        "category": category,
     }
 
 
@@ -188,11 +159,13 @@ def classify_question(model: str, question: str, n_votes: int = 2) -> dict:
 # Pipeline principal
 # ---------------------------------------------------------------------------
 
-def run(model: str, input_path: str, output_path: str,
-        low_conf_path: str, checkpoint_path: str,
-        sample: int | None, n_votes: int):
+def run(model: str, input_path: str, output_path: str, checkpoint_path: str,
+    sample: int | None):
 
     df = pd.read_csv(input_path)
+    if "id" not in df.columns:
+        df.insert(0, "id", range(len(df)))
+
     if sample:
         df = df.sample(n=sample, random_state=42).reset_index(drop=True)
         print(f"Modo prueba: {sample} registros aleatorios.")
@@ -200,8 +173,7 @@ def run(model: str, input_path: str, output_path: str,
     total = len(df)
     print(f"\nDataset : {total} preguntas")
     print(f"Modelo  : {model} (Ollama local)")
-    print(f"Votos   : {n_votes} por pregunta")
-    print(f"Umbral  : confianza < {CONFIDENCE_THRESHOLD} → revisión manual\n")
+    print("Clasificación: 1 llamada por pregunta\n")
 
     # Verificar que Ollama está corriendo
     try:
@@ -213,60 +185,49 @@ def run(model: str, input_path: str, output_path: str,
         )
 
     # Checkpoint
-    checkpoint = Path(checkpoint_path)
-    results: dict[int, dict] = {}
+    checkpoint = build_run_checkpoint_path(checkpoint_path, model, input_path, sample)
+    results: dict[int, dict[str, Any]] = {}
+    print(f"Checkpoint: {checkpoint.name}")
+
     if checkpoint.exists():
         with open(checkpoint) as f:
             results = {int(k): v for k, v in json.load(f).items()}
         print(f"Checkpoint: {len(results)} registros ya clasificados.")
 
-    pending = [i for i in range(total) if i not in results]
+    all_ids = [int(x) for x in df["id"].tolist()]
+    pending = [row_id for row_id in all_ids if row_id not in results]
     print(f"Pendientes: {len(pending)}\n")
 
     save_every = 50
 
-    for count, idx in enumerate(tqdm(pending, total=len(pending), desc="Clasificando")):
-        question = str(df.loc[idx, "question"])
-        results[idx] = classify_question(model, question, n_votes)
+    for count, row_id in enumerate(tqdm(pending, total=len(pending), desc="Clasificando")):
+        row = df[df["id"] == row_id].iloc[0]
+        question = str(row["question"])
+        results[row_id] = classify_question(model, question)
 
         if (count + 1) % save_every == 0:
             with open(checkpoint, "w") as f:
                 json.dump(results, f)
-            low = sum(1 for r in results.values() if r.get("low_confidence"))
-            print(f"  [{len(results)}/{total}] guardado | baja confianza hasta ahora: {low}")
+            unknown = sum(1 for r in results.values() if r.get("category") == "UNKNOWN")
+            print(f"  [{len(results)}/{total}] guardado | UNKNOWN hasta ahora: {unknown}")
 
     # Checkpoint final
     with open(checkpoint, "w") as f:
         json.dump(results, f)
 
     # Construir DataFrame
-    df["category"]       = [results[i]["category"]                  for i in range(total)]
-    df["confidence"]     = [results[i]["confidence"]                for i in range(total)]
-    df["reason"]         = [results[i]["reason"]                    for i in range(total)]
-    df["votes"]          = ["|".join(results[i].get("votes", []))   for i in range(total)]
-    df["low_confidence"] = [results[i].get("low_confidence", False) for i in range(total)]
+    df["category"] = [results[int(row_id)]["category"] for row_id in df["id"]]
 
-    # Separar confiables de dudosos
-    clean_df = df[df["low_confidence"] == False].copy()
-    low_df   = df[df["low_confidence"] == True].copy()
+    df.to_csv(output_path, index=False)
+    print(f"\nDataset clasificado: {len(df)} registros → {output_path}")
 
-    # CSV solo clasificaciones confiables
-    clean_df.to_csv(output_path, index=False)
-    print(f"\nDataset clasificado: {len(clean_df)} registros → {output_path}")
+    unknown_count = int((df["category"] == "UNKNOWN").sum())
+    print(f"UNKNOWN          : {unknown_count} registros")
 
-    # CSV baja confianza / UNKNOWN
-    low_df.to_csv(low_conf_path, index=False)
-    print(f"Revisión manual    : {len(low_df)} registros → {low_conf_path}")
-
-    # Resumen (solo confiables)
-    print("\n=== DISTRIBUCIÓN FINAL (confiables) ===")
-    stats = clean_df["category"].value_counts()
-    pct   = clean_df["category"].value_counts(normalize=True) * 100
+    print("\n=== DISTRIBUCIÓN FINAL ===")
+    stats = df["category"].value_counts()
+    pct   = df["category"].value_counts(normalize=True) * 100
     print(pd.DataFrame({"N": stats, "%": pct.round(1)}))
-
-    print(f"\nConfianza promedio : {clean_df['confidence'].mean():.3f}")
-    print(f"Alta confianza (≥{CONFIDENCE_THRESHOLD}) : {len(clean_df)} ({len(clean_df)/total*100:.1f}%)")
-    print(f"Revisión manual    : {len(low_df)} ({len(low_df)/total*100:.1f}%) → revisa manualmente")
 
 
 # ---------------------------------------------------------------------------
@@ -275,24 +236,19 @@ def run(model: str, input_path: str, output_path: str,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Clasificador SLM_netconfig con DeepSeek-R1 via Ollama"
+        description="Clasificador SLM_netconfig con Qwen via Ollama"
     )
-    parser.add_argument("--model",      type=str, default="llama3.1:8b")
+    parser.add_argument("--model",      type=str, default="qwen2.5:14b")
     parser.add_argument("--input",      type=str, default="requirements_questions_v2.csv")
-    parser.add_argument("--output",     type=str, default="requirements_classified_v2.csv")
-    parser.add_argument("--low-conf",   type=str, default="requirements_low_confidence_v2.csv")
-    parser.add_argument("--checkpoint", type=str, default="ollama_checkpoint_v2.json")
+    parser.add_argument("--output",     type=str, default="requirements_classified_v3.csv")
+    parser.add_argument("--checkpoint", type=str, default="ollama_checkpoint_v3.json")
     parser.add_argument("--sample",     type=int, default=None)
-    parser.add_argument("--votes",      type=int, default=2,
-                        help="Número de votos por pregunta (default: 2)")
     args = parser.parse_args()
 
     run(
         model=args.model,
         input_path=args.input,
         output_path=args.output,
-        low_conf_path=args.low_conf,
         checkpoint_path=args.checkpoint,
         sample=args.sample,
-        n_votes=args.votes,
     )
