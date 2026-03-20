@@ -1,0 +1,421 @@
+id,question,answer,ground_truth_category
+1094,How do I enable Ethernet CFM AIS link status globally?,,MONITORING
+3924,How can we configure BFD (Bidirectional Forwarding Detection) for an OSPF network?,,ROUTING
+2928,How do you configure a flow class for Cisco Performance Monitor?,,MONITORING
+1810,How can you configure the Login Password Retry Lockout feature to lock out a local AAA user account after a certain number of unsuccessful login attempts?,,SECURITY
+2697,How do you configure aggressive aging for per-VRF inspection in Cisco IOS?,,SECURITY
+3141,How do you enter privileged EXEC mode on a Cisco router?,,GENERAL
+1917,What is the command to configure the device as a hub-master controller in Data Center 1 (DC1)?,,GENERAL
+1515,How can we configure a larger retention interval for retries in Cisco IOS?,,GENERAL
+740,How do you configure Zero Touch Auto-IP functionality on devices in a ring network?,,CONNECTIVITY
+2259,How do you remove the secondary configuration elements from the running configuration?,,GENERAL
+1279,How can you exit the global configuration mode and return to privileged EXEC mode?,,GENERAL
+884,What is the NID Support feature on Cisco ISR 4K Series Integrated Services Routers?,,GENERAL
+2383,What is the correct command to set up an IPsec VPN with the specified configurations and parameters?,,SECURITY
+311,What is the configuration required to ensure that CallManager Express can be colocated with CallManager on the same device?,,GENERAL
+1337,How can we configure a Cisco router to join multicast traffic towards an AMT relay when the mroute shows incoming interface as Tunnel and when joined?,,ROUTING
+1787,What are the steps to configure a RADIUS server with an AAA server group and associate private servers?,,SECURITY
+1993,How can we configure the application SaaS to connect to the Servicenow domain?,,CONNECTIVITY
+4428,How do you define traffic classes for Quality of Service (QoS) in an IPv6 environment?,,QOS
+774,What are the configured Ethernet OAM link-monitor frame-period and frame-seconds parameters?,,MONITORING
+3537,How can you implement a hierarchical policy for GigabitEthernet1/0/0 to manage traffic based on class-maps and service policies?,,QOS
+143,"What is the configuration command to enable On-Demand IP SLAs operations for Ethernet SLM domain xxx with VLAN 10, MPI D 3, COs 1, source MPI 1, continuous aggregation of 35, and duration of 38?",,MONITORING
+3527,How can you implement an interface scheduling mechanism to maintain distinct buffers and queues for priority and bandwidth traffic while minimizing jitter for latency sensitive traffic?,,QOS
+3869,What is the correct Cisco IOS command to update the SAF peering site prefix at 10.20.1.1 with the given prefixes?,,ROUTING
+4056,How can I enable MQC (Match-All) based on transport hierarchy and configure the necessary protocols and class maps for an in-app-hierarchy?,,QOS
+358,How can you configure a redundant traffic interface on a GigabitEthernet interface to ensure high availability of network connections?,,CONNECTIVITY
+882,Question: How can you apply an IP access list to an interface in Cisco IOS?,,SECURITY
+733,How can you configure the auto-IP address on node interfaces for inclusion in an Auto-IP ring?,,CONNECTIVITY
+3180,"What commands are needed to redistribute connected and static routes for VRFs cust1 and cust2, and originate default information?",,ROUTING
+4542,"What is the correct syntax to apply a service policy to an interface using the ""policy-map"" command?",,QOS
+1805,"To stay updated with the latest information about Cisco products and services, what are some recommended subscriptions that I can access from the Cisco Support website?",,GENERAL
+1297,What is the Router-ID of the OSPF instance configured on the Downstream-router?,,ROUTING
+686,How to execute Cisco IOS XE CLI EXEC mode commands from a Tcl script?,,GENERAL
+116,How do you schedule an IP SLA operation to run every day at 8am for the next week?,,MONITORING
+4285,How can we ensure reliable delivery of syslog messages to a remote server?,,MONITORING
+1406,How can you enable IPv6 PIM Passive mode on the Cisco IOS XE platform?,,ROUTING
+28,"What is the purpose of the ""ip sla responder"" command in Cisco IOS?",,MONITORING
+3450,"What are the traffic priorities and rate limiting configurations for the ""voice"" class in the ""simple-example"" policy-map?",,QOS
+3078,How can we ensure that NHSs from different data centers are always connected to each other?,,CONNECTIVITY
+4040,How can we enable protocol discovery on the Cisco router?,,MONITORING
+3477,How does the Cisco router schedule packets in a network environment to ensure fairness between queues with minimum guarantees?,,QOS
+713,What is the primary function of the device when configured with the given requirement and configuration?,,GENERAL
+1272,What is the minimum set of commands needed to enter the global configuration mode in Cisco IOS?,,GENERAL
+1664,"** How can we enable fallback methods for authentication, authorization, or accounting in a Cisco router?",,SECURITY
+3755,"What is the correct configuration to configure an interface with encapsulation dot1Q 100, IP address 10.1.10.1, and a subnet mask of 255.255.255.0 on GigabitEthernet5.100?",,CONNECTIVITY
+695,How can you specify the format in which netmasks appear for the current session?,,GENERAL
+1983,"How can I enable NAT on a router that has DCA enabled or other devices in the path, while also configuring a firewall to control traffic?",,SECURITY
+112,How can you set the timeout for an IP SLAs Ethernet operation to 10 seconds?,,MONITORING
+1491,What is the configuration used to define the route-target extended community for a VRF?,,ROUTING
+1770,How do I enable privileged EXEC mode and display RADIUS servers configured in the global configuration mode?,,SECURITY
+742,What IP address range would you allocate for the Auto-IP ring and how would you configure one port as the seed port in the Auto-IP ring?,,CONNECTIVITY
+230,"How can we schedule multiple operations within the 5-second schedule period for Operation Group 3, considering the frequency of one operation every 0.5 seconds?",,GENERAL
+3719,How can you configure the prefix-list containing a list of site prefixes on a device?,,ROUTING
+1501,How can you enable the Inter-Switch Link (ISL) for VLAN subinterfaces and set primary or secondary IP addresses for interfaces?,,CONNECTIVITY
+678,"How can we establish a tunnel between the source IP address 9.1.90.97 and the destination IP address 9.1.89.97, specifying the key as 5 and UDLR settings for sending only data over GigabitEthernet2/3/0 while also enabling address resolution?",,CONNECTIVITY
+4193,How can we configure Cisco IOS keepalives or DPD features for stateless failover with multiple peers in the crypto map?,,SECURITY
+4538,What are the different types of actions that can be specified in a police enhancement configuration to mark packets?,,QOS
+563, How can we dynamically translate multicast addresses using Cisco IOS?,,ROUTING
+1562,What is the recommended syntax to configure the interpacket delay in milliseconds?,,QOS
+2858,What is the command used to enter interface configuration mode?,,GENERAL
+4230,How can I enable image support for Cisco routers?,,GENERAL
+2353,How do you enable privileged EXEC mode and configure IKE authentication using a crypto keyring and preshared key in Cisco router?,,SECURITY
+1936,How can we ensure that Site IDs are unique for each site?,,GENERAL
+1024,What is the recommended configuration for enabling mLACP feature with LACP state machine for a dual-homed topology in compliance with IEEE 802.3ad standard?,,CONNECTIVITY
+2256,How can we enable privileges and grant access to the USB token for recovery scenarios?,,SECURITY
+117,How can we configure the IP SLA Ethernet-Monitor to detect three consecutive connection loss events and send an SNMP trap notification?,,MONITORING
+1822,How can we configure the point-to-point interface to reset immediately after an authentication failure or within a specified number of authentication retries?,,SECURITY
+4540,What happens to packets destined to the control plane when an input QoS policy map is configured on the Cisco ASR 1K Series Router?,,QOS
+3444,How can we handle service-not-available events for ISDN modem calls coming in over an ISDN connection?,,CONNECTIVITY
+888,How can I enable debugging for configuration-related issues in my Cisco router?,,MONITORING
+4135,How can we configure the RADIUS attribute 8 Framed-IP-Address in Access Requests on a Cisco router?,,SECURITY
+1041,How do I return to privileged EXEC mode from the current CLI mode?,,GENERAL
+2779,How can I configure firewall session table protection for a VRF (Virtual Routing and Forwarding) domain?,,SECURITY
+4245,How can we enable PGM Router Assist on a vif interface?,,ROUTING
+3689,What would be the default queue-limits for an interface if it is shaped to 100 Mbps?,,QOS
+463,How can we enable connectivity between IPv4 and IPv6 hosts when implementing stateless NAT?,,CONNECTIVITY
+758,What is the purpose of putting the remote peer into loopback mode during installation or troubleshooting?,,CONNECTIVITY
+394,How do you configure outside dynamic NAT with MPLS VPNs?,,ROUTING
+827,How can I return to the global configuration mode from the current mode?,,GENERAL
+2296,How can we configure the device to include EKU attributes in the PKI server?,,SECURITY
+2304,What is the recommended encryption method to ensure secure communication when configuring a Cisco router?,,SECURITY
+3750,How can you configure a Gigabit Ethernet interface with a specific IP subnet and set the speed and negotiation settings?,,CONNECTIVITY
+2090,How do you configure the certificate map and trustpoint for VPN-GW on the central site router?,,SECURITY
+3169,What is the subnet mask for the directly connected network on Ethernet1/0?,,CONNECTIVITY
+907,How do you configure a port channel and set the channel group mode?,,CONNECTIVITY
+988,How do EVC and UNI attributes get communicated to a CE device?,,CONNECTIVITY
+3449,What is the purpose of this configuration?,,GENERAL
+3432,How can we configure the access server to dial out with IP protocol?,,CONNECTIVITY
+234,How can you configure a group schedule in global configuration mode with uniformly distributed random frequencies within a specified range to ensure that no operation is scheduled more than once within the period?,,GENERAL
+601,How can I customize IGMP settings to support IGMP proxy on the downstream UDL device?,,ROUTING
+1587,What commands can you use to configure AAA security services for login authentication methods?,,SECURITY
+1241,What happens when a PIM designated router registers a source with its RP?,,ROUTING
+4279,How can you enable global configuration mode and enable system message logging to a local buffer with severity-based limits in Cisco IOS?,,MONITORING
+4365,How can I display the configuration of a specific policy map or all existing policy maps?,,QOS
+2969,How can we extract metrics information and configure it for Assurance Monitoring in DNA Center to track the total number of responses sent by the server?,,MONITORING
+4564,How can we ensure that certain types of network traffic are given priority over others when entering the network?,,QOS
+737,How can you configure Auto-IP functionality on node interfaces to include them in an Auto-IP Ring?,,CONNECTIVITY
+1080,How do we configure the port channel on the active and standby PoA for Pseudo mLACP?,,CONNECTIVITY
+2011,How can we configure prefix updates for multiple IP addresses from a specific source address in Cisco IOS?,,ROUTING
+2021,What is the recommended configuration for supporting multiple CAs in our PKI infrastructure?,,SECURITY
+1651,"How can you configure RADIUS authentication and authorization on Cisco IOS XE software to provide login, PPP, EXEC, and network authorization?",,SECURITY
+4436,What command is used to specify the relative weight of a subinterface or queue with respect to other subinterfaces or queues during congestion?,,QOS
+3081,What is the minimum number of connections required to form a tunnel between each cluster and the spoke in the given configuration?,,CONNECTIVITY
+1258,How can we configure the device to filter incoming SA messages based on their origin?,,SECURITY
+192,How can you configure the Type of Service (ToS) byte in the IP header of an IP SLAs operation?,,QOS
+3181,"How can we enable 6VPE support in MPLS over DMVPN phase 2 for the hub by configuring VRF, Tunnel, IPsec Tunnel Protection, WAN Facing Interface, Transport Routing, and Overlay Routing?",,ROUTING
+913,How can we prioritize LACP (Link Aggregation Control Protocol) in a Cisco router?,,CONNECTIVITY
+4141,What is the role of an L2TP Access Concentrator (LAC) in setting up tunnels with the customer tunnel server?,,CONNECTIVITY
+2258,"How can you enable the ""secondary"" Crypto PKI token with a PIN?",,SECURITY
+834,How can I enable Ethernet Connectivity Fault Management (CFM) with IEEE 802.1ag Standard on my device?,,CONNECTIVITY
+3859,How can I display PfRv3 event tracing for all components (sub-components) in Cisco IOS?,,MONITORING
+1520,How can I configure Cisco router to support all Cisco implemented MIBs for error reporting and statistics during data collection and transfer?,,MONITORING
+743,How do you enable LLDP on all Auto-IP ring ports before configuring Auto-IP?,,CONNECTIVITY
+783,How can service providers leverage Cisco's networking solutions to gain a competitive advantage in their market?,,GENERAL
+2615,"What configuration options are required to configure VRF ""vrf-cust1"" on GigabitEthernet interface 0/2/3 for multicast routing?",,ROUTING
+1564,How can you configure a router to use the IP-RIP Delay Start feature on a Frame Relay interface?,,ROUTING
+2262,How can we configure the router to copy files from a USB token to the device?,,GENERAL
+4248,What is the configuration for the IP PGM Host feature on this PGM Host with physical interfaces?,,ROUTING
+1055,What are the steps to enter global configuration mode and configure a Layer 2 Virtual Routing and Forwarding (VRF) instance with specific details?,,ROUTING
+3025,How can we enable replay detection for our Cisco device?,,SECURITY
+3191,How do you define a port-channel before configuring it to prevent errors?,,CONNECTIVITY
+1042,How do you configure a port channel and its interface?,,CONNECTIVITY
+755,How can we enable OAM capabilities for discovery and advertisement of information within periodic OAM PDUs?,,MONITORING
+535,"What is the primary function of an Application-Level Gateway (ALG) supported by Firewall and Network Address Translation (NAT), considering the given configuration?",,SECURITY
+193,What is the command used to enable privileged EXEC mode on a Cisco router?,,GENERAL
+2986,How can I configure memory reservation for critical notifications to prevent the router from being overwhelmed when it's processing heavy loads?,,GENERAL
+1773,What is the purpose of the Dynamic Per VRF AAA feature in Cisco IOS XE Release 2.4 and later releases?,,SECURITY
+3752,What IP address and subnet mask have been configured for interface GigabitEthernet3?,,CONNECTIVITY
+156,"How can you measure the round-trip time (RTT) between a Cisco device and an HTTP server for DNS lookup, TCP connection, and HTTP transaction to retrieve a web page?",,MONITORING
+2066,How can we configure the enrollment URL and PEM file for a Cisco router to enable automatic enrollment in a Certificate Authority?,,SECURITY
+427,How can you exit the interface configuration mode and enter the global configuration mode?,,GENERAL
+2177,What is the command to direct the TTI registrar to use a custom start page template?,,GENERAL
+2571,How to configure Asymmetric Routing with Redundant Interface Identifier (RII) on both active and standby devices?,,ROUTING
+3126,How can you configure an NHRP Group to be mapped to a QoS Policy on the Hub?,,QOS
+2923,How do you specify the IP address or hostname of the system to which the exporter sends data in Cisco IOS configuration?,,MONITORING
+832,How do you define a CFM (Connectivity Fault Management) maintenance domain at a particular level?,,MONITORING
+2087,How do you configure the trustpoint for the certificate authority (CA) to disable nonces in communications with the OCSP server?,,SECURITY
+3221,What is the minimum requirement for configuring a GLBP group in terms of virtual IP addresses?,,ROUTING
+3448,What is the correct command syntax to create a class-map with match-all semantics in Cisco IOS?,,QOS
+155,How can we add proactive threshold conditions and reactive triggering for generating traps or starting another operation to an IP Service Level Agreements (SLAs) operation?,,MONITORING
+3345,"How do you configure HSRP with MIB trap support functionality on two devices, with Device A having a higher priority level and enabling preemption?",,ROUTING
+3787,What is the default priority value for a given requirement in Cisco IOS?,,GENERAL
+4032,How do I view NBAR2 Taxonomy Information?,,MONITORING
+4039,How can we enable protocol discovery for IPv6 and IPv4 packets on Fast Ethernet interface 1/1/2?,,MONITORING
+778,How can you disable high threshold link monitoring for receive CRC errors on the Ethernet OAM interface?,,MONITORING
+35,How to configure IP SLAs Multicast Support for UDP Jitter operations?,,MONITORING
+2567,How can you configure application redundancy for a redundancy group in global configuration mode?,,GENERAL
+3257,How can we enable HSRP MIB trap support for HSRP BFD Peering?,,MONITORING
+1444,How do you configure SNMP notifications to be sent as traps or informs?,,MONITORING
+32,How can you exit global configuration mode and return to privileged EXEC mode?,,GENERAL
+2003,How can you enable channel-based measurement with a specific sampling packet size and rate on a Cisco device?,,MONITORING
+1073,What is the value of the `rg_id` parameter in this configuration?,,GENERAL
+3451,"How can you differentiate traffic for voice, video, and YouTube classes in a policy-map and apply actions like priority, police, and bandwidth?",,QOS
+3445,How can you configure QoS policies aggregation with egress MQC queuing at subinterface level?,,QOS
+4525,How do I configure Traffic Policing to limit the output transmission rate of a class of traffic based on user-defined criteria?,,QOS
+3065,"How to configure an interface with IPv6 address and settings for DMVPN, NHRP, and tunnel parameters?",,ROUTING
+2716,What command is used to configure the aging out of firewall sessions?,,SECURITY
+2417,"How can you match the Internet Control Message Protocol (ICMP) on a Windows system using the `traceroute` command, and configure an out-to-in zone-based policy with ICMP time-exceeded and host unreachable commands using the `pass` command in Cisco IOS XE Release 3.1S?",,SECURITY
+1277,How do I enable MSDP SA-Request Filtering on my device?,,SECURITY
+4320,What happens when none of the routers in the network have any interested receivers for a given multicast group address?,,ROUTING
+1354,How can we configure the router to participate in a multicast network by joining a specific group address for all interfaces?,,ROUTING
+1320,How do you configure the tunnel source and destination addresses to match between Router A and Router B?,,CONNECTIVITY
+1940,What is the Cisco IOS XE software requirement for ensuring Zero SLA in a network?,,GENERAL
+4172,How can we increase the maximum number of packets tracked by the IPsec Anti-Replay feature in our Cisco router configuration?,,SECURITY
+190,How do you configure the SNMP owner and number of paths for which statistics are maintained per hour for an IP SLAs operation?,,MONITORING
+3452,How to implement QoS using policy-maps and class-maps in Cisco IOS XE Gibraltar to limit the voice traffic to 10 Mbps for parent-vlan100 and 5 Mbps for parent-vlan200?,,QOS
+3893,What conditions must be met for a gateway to be considered reachable and routes to be installed in the RIB?,,ROUTING
+775,What command can you use to configure a port for Link Fault RFI Support by putting it into a blocking state when an OAM PDU control request packet is received with the Link Fault Status flag set?,,CONNECTIVITY
+450,What are the steps to configure redundancy group settings for a redundancy application group in Cisco IOS?,,GENERAL
+1531,How do you configure the default-information originate command on an interface to control the originating of the default route (::/0) in updates sent on that interface?,,ROUTING
+197,What is the configuration for the Path Echo operation (ip sla 3) from Device B to Device A?,,MONITORING
+1941,How do you configure an internet-bound interface with specific attributes for Internet Service Providers (ISPs) using Cisco IOS XE?,,CONNECTIVITY
+3367,What is the recommended configuration to configure multiple devices as the default gateway using VRRP (Virtual Router Redundancy Protocol) in a network to reduce the possibility of a single point of failure?,,ROUTING
+1966,How can we enable PfRv3 Remote Prefix Tracking feature to learn the prefix of a remote device from the Routing Information Base (RIB) table in Cisco IOS?,,ROUTING
+510,How can we optimize the High-Speed Logging in Bulk Logging and Port Block Allocation to reduce the volume of NAT high-speed logging?,,MONITORING
+73,How can we enable IP SLAs Cisco Packet Processor (CPP) time stamping to improve the accuracy of IP SLAs UDP jitter operations on our Cisco ASR 1000 Series routers?,,MONITORING
+703,How can we configure an IP address with a 31-bit prefix on a point-to-point interface when IP classless addressing is enabled?,,CONNECTIVITY
+3568,How can we mark MPLS packets with a specific Experimental value according to the QoS (Quality of Service) policy?,,QOS
+1711,What are the steps to update existing server groups in Cisco IOS to reference newly defined cache groups for optimization and failover mechanisms?,,GENERAL
+1026,How are ports uniquely identified within a system in this configuration?,,GENERAL
+2774,How can I enable ALGs (Application Layer Gateways) and AICs (Inspection Components) in zone-based policy firewalls?,,SECURITY
+2831,What is the purpose of configuring vTCP on a firewall?,,SECURITY
+195,What is the current IP SLAs configuration on the router?,,MONITORING
+1686,How to enable domain stripping on the server group level for RADIUS servers in Cisco IOS?,,SECURITY
+3454,What is the purpose of creating multiple policy-map configurations in this scenario?,,QOS
+3407,How do you enable RTP header compression (cRTP) on a Cisco ASR 1k series router running Cisco IOS XE Release 2.1?,,QOS
+2866,How can we ensure granular security control over application-specific commands while synchronizing multiple streams or sessions of data between two hosts?,,SECURITY
+2446,How to configure a class-map type inspect for most-traffic and create an inspect type policy-map with HTTP as match criteria?,,SECURITY
+2829,What are the minimum system requirements to enable vTCP for ALG support on Cisco IOS XE Release 3.1 or later?,,GENERAL
+3609,How can you configure egress policing and marking on port-channel member links?,,QOS
+4297,"How can we maintain counts, rates, and bytes of received, dropped, and forwarded multicast packets?",,MONITORING
+2884,How do you enable Mediatrace Initiator on the configuring node and configure each node that collects information to act as a Mediatrace Responder?,,MONITORING
+2948,What is the total number of packets sent by the client?,,MONITORING
+1032,What is the value of `max-bundle` that should be configured on the DHD to ensure maximum reliability in case of link failures?,,CONNECTIVITY
+3744,What is the command to set up the domain name for R11 as per the requirement?,,GENERAL
+2149,What happens if there is no IP connectivity at the completion of the prep-connect phase?,,CONNECTIVITY
+756,"What are the maximum OAM PDU size settings for receipt and delivery, as well as rate limiting configuration, to control bandwidth allocation for OAM traffic on our Cisco device?",,QOS
+4150,How can you ensure that the clock on your network device remains configured even after it is reloaded?,,GENERAL
+2856,What is the command used to enter interface configuration mode?,,GENERAL
+111,What is the default value for IP SLAs Ethernet ping operations?,,MONITORING
+3369,What is the correct way to configure the priority for a VRRP device function as a virtual primary device backup?,,ROUTING
+2870,How do you enable SIP Inspection on the device?,,SECURITY
+2985,How do you set up memory reservation for critical operations in Cisco IOS?,,GENERAL
+552,What is the timeout value for SIP ALG resilience to DoS attacks?,,SECURITY
+3850,What is the IP address of the GigabitEthernet0/0/3 interface in the Border?,,CONNECTIVITY
+431,How can you configure Dynamic Stateful Network Address Translation 64 (DS-Lite) to translate IPv6 addresses to IPv4 addresses on a Cisco device?,,CONNECTIVITY
+2908,What is the egress interface configuration required for the network?,,CONNECTIVITY
+395,How can we monitor the NAT translation information?,,MONITORING
+188,How can I enable privileged EXEC mode?,,GENERAL
+3650,"How can we configure class-based policing to mark RTP traffic with COS 3 if it exceeds the configured rate, while dropping any other excess traffic?",,QOS
+4337,"How can I locate and download MIBs for selected platforms, Cisco IOS releases, and feature sets using Cisco MIB Locator?",,MONITORING
+3091,"How can we enable SNMP NHRP traps for NHS, NHC, and NHP events on a Cisco device?",,MONITORING
+446,How can we configure an Active/Active Redundancy Group for load sharing between two interfaces?,,CONNECTIVITY
+1269,How can you configure MSDP keepalive settings for additional peers in Cisco IOS?,,ROUTING
+1497,What encryption protocol can be used for authentication in SNMP Version 3 on a Cisco device?,,SECURITY
+3535,How can you provide unique treatment to different classes of traffic on a physical interface without VLAN tags?,,QOS
+3701,What is the new maximum threshold for WRED (Weighted Random Early Detection) to provide preferential treatment to af11 over af12 under congestion?,,QOS
+903,How can we implement non-stop forwarding (NSF) and non-stop routing (NSR) on Gigabit EtherChannel bundles?,,ROUTING
+3596,What command is used to attach a traffic policy to the EVC?,,QOS
+4060,What are the available attributes for configuring NNTP protocol in a device?,,GENERAL
+13,What happens to one-way delay measurements when time synchronization is not required for one-way jitter and packet loss measurements in Cisco IOS?,,MONITORING
+3902,What steps can be taken to configure BFD support for BGP to receive forwarding path detection failure messages from BFD?,,ROUTING
+445,How can you configure application redundancy on a device?,,GENERAL
+3419,What are the steps to implement AAA security services with TACACS+ for PAP authentication on a serial interface?,,SECURITY
+4211,How do you enable QoS group-based LLQ for IPsec encryption engines?,,QOS
+3401,How do I enable RTP header compression in Cisco IOS?,,QOS
+1906,What are the IPsec profile configurations for DMVPN on a Cisco device?,,SECURITY
+359,What type of traffic does not support asymmetric routing in Interchassis Asymmetric Routing Support for Zone-Based Firewall and NAT?,,SECURITY
+4562,What is an effective way to implement class-based policing in Cisco IOS to limit traffic entering or exiting a network?,,QOS
+471,What is the configuration command to enable MAP-T with Path MTU Discovery and Fragmentation for IPv4-to-IPv6 translation on Cisco routers?,,ROUTING
+4254,How can we configure the Manager in Cisco IOS to monitor multicast routing?,,MONITORING
+3990,How would you apply Quality of Service (QoS) to an application that uses a specific protocol with dynamically assigned TCP port numbers?,,QOS
+1537,How can we configure route tags for IPv6 RIP routes in Cisco IOS?,,ROUTING
+659,How can we configure an RGMP-enabled router to prevent it from sending an RGMP leave message until it stops receiving or forwarding traffic for a specific multicast group?,,ROUTING
+497,What type of address pooling is supported by Cisco routers in both classic and carrier-grade NAT modes?,,ROUTING
+1782,What is the command used to configure an interface type and enter interface configuration mode?,,GENERAL
+964,What Cisco IOS command can you use to map ingress Dot1Q frames to the appropriate service instance?,,CONNECTIVITY
+887,How can you verify connectivity with port tagging configured on the GigabitEthernet0/2 interfaces?,,CONNECTIVITY
+2564,"In an asymmetric routing scenario, what configuration is required to ensure that the redundancy interface identifier (RII) maps correctly to interfaces, route groups (RGs), and applications?",,ROUTING
+398,How can we configure NetFlow-like records to be sent to an external collector for each binding and when sessions are created and destroyed in Cisco IOS?,,MONITORING
+4295,How do I enable DiffServ MIB support for Quality of Service (QoS) on a Cisco device?,,QOS
+3633,How do you enter interface configuration mode to configure a virtual template interface?,,GENERAL
+1012,How can I monitor the LLDP neighbors in my multivendor network?,,MONITORING
+4565,How to configure Class-Based Policing for Traffic Policing Service Policy?,,QOS
+1395,How does the device handle multicast datagram forwarding when using Reverse Path Forwarding (RPF)?,,ROUTING
+4225,How do you configure IPv6 on a tunnel interface in Cisco IOS?,,ROUTING
+2091,"How can you configure a VPN gateway with subject name ""o=Home Office Inc,cn=Central VPN Gateway"" to use Certificate Revocation List (CRL) for revocation checks and remove the match certificate command once the branch router has a new certificate?",,SECURITY
+113,What command can I use to enter privileged EXEC mode in Cisco IOS?,,GENERAL
+2537,How do you configure a zone member for security in Cisco IOS?,,SECURITY
+2115,"How can I request separate encryption, signature keys, and certificates with the same key size in Cisco IOS?",,SECURITY
+2239,How do you configure the RSA key generation for a Cisco device's certificate authority (CA) to enroll with a trust point?,,SECURITY
+3046,How can we enable IPv6 NHRP Redirect and Shortcut features on our dual-stack device to optimize routing and trigger NHRP when necessary?,,ROUTING
+3484,How can we adjust the default scheduling length per packet to achieve a specific behavior?,,QOS
+2084,What is the configuration required to ensure that the router is authorized to connect using VPN and check with a Cisco Secure ACS AAA server prior to establishing a VPN connection?,,SECURITY
+4177,How can we ensure that our router is configured to handle a large number of packets received?,,QOS
+1519,What configuration command would you use to configure periodic MIB data collection and transfer mechanism with retry attempts for file transfers?,,MONITORING
+2134,What is the configuration of the RSA key pair used for general purpose and encryption usage in our network?,,SECURITY
+3965,How can I exit the keychain-key configuration mode and return to privileged EXEC mode?,,GENERAL
+235,"How can we configure the IP SLAs Multioperation Scheduler to ensure only one operation is scheduled at any given time, unless the random scheduler option is disabled?",,MONITORING
+3510,What are the classification statistics and criteria for the video class in this Cisco network configuration?,,QOS
+238,"What is the configuration command used to schedule operations with uniformly distributed random intervals over a schedule period of 50 seconds, starting immediately?",,GENERAL
+224,How do I enter privileged EXEC mode on the device?,,GENERAL
+3688,How does the visible bandwidth of a queue depend on the configuration commands used?,,QOS
+410,How to configure a routing network for Stateless NAT64 translation?,,ROUTING
+1287,"When processing an incoming (*, G) Join in a PIM-enabled network, how can we ensure that receiving devices use their own RP if it differs from the one specified in the join message?",,ROUTING
+4463,What configuration is required for template services activation at the child level?,,GENERAL
+1605,"What is the default authentication method used for ARAP (Apple Remote Access Protocol) connections when the ""aaa authentication arap default line"" configuration command is issued?",,SECURITY
+989,How can we achieve accelerated deployment of new services and applications while reducing network downtime during upgrades?,,GENERAL
+1207,How to configure Source Specific Multicast (SSM) for access lists in IP Multicast Operation?,,ROUTING
+2711,How can you enable privileged EXEC mode on the Cisco router?,,GENERAL
+2472,What is the configuration command used to permit traffic from a specific source IPv6 address (2001:DB8:1::2) to a destination IPv6 address (209.165.201.25)?,,SECURITY
+1113,ow can you configure a dual-homed device to enable trunking on a Port-channel interface? ,,CONNECTIVITY
+1603,How is the AAA authentication configured to allow guest logins through ARAP and use RADIUS as a backup method?,,SECURITY
+2143,How can I establish IP connectivity between the petitioner device and the server?,,CONNECTIVITY
+152,How can I exit the global configuration mode and return to privileged EXEC mode?,,GENERAL
+3589,What command can be used to configure the minimum bandwidth guarantee for a class and enable flow-based queueing feature within that traffic class?,,QOS
+1972,What are the probing parameters configured for the regular interface (Branch 1 Router) and LTE interface (Branch 2 Router)?,,MONITORING
+123,How do you configure the receiver on the responder to enter IP SLA Y.17.31 delay configuration mode?,,MONITORING
+675,What is the purpose of GigabitEthernet1/0/0 interface in this configuration?,,CONNECTIVITY
+281,"What does the ""ip nat inside"" command do in Cisco IOS?",,CONNECTIVITY
+912,How can you set the LACP system priority and port priority on a Cisco device?,,CONNECTIVITY
+4292,How can we configure syslog to ensure reliable delivery and filtering of log messages?,,MONITORING
+4091,How can we configure our router to dynamically monitor critical applications and collect detailed Layer 7 metrics for fine-grained NBAR (Network-Based Application Recognition) in selective applications?,,MONITORING
+4235,How can we configure the maximum number of Virtual Circuits (VCs) allowed for PIM?,,ROUTING
+1926,What are the necessary steps to configure BR95 as a border router with VRF 'default' and establish a tunnel to DMVPN2 (INET)Link?,,ROUTING
+1694,How can we implement a throttling mechanism for controlling packets at the NAS level to improve RADIUS server performance?,,QOS
+231,How do we divide operations for operation group 3 when scheduling operations in each 1-second interval?,,GENERAL
+1087,What is the MLACP configuration for interchassis grouping and load balancing across multiple VLANs?,,CONNECTIVITY
+4502,How can we configure the router to download the name of the policy map from RADIUS using the Cisco AV-pair and apply the QoS policy to the session?,,QOS
+364,How can you ensure that MPLS diversion with label removal occurs before asymmetric routing happens in your network configuration?,,ROUTING
+3339,How do you enable Stateful Switchover (SSO) for HSRP on Cisco IOS devices?,,ROUTING
+2914,What is a common use case for acquiring IP operational data from IP networks?,,MONITORING
+731,How to configure auto-IP on EtherChannel interface in Cisco IOS?,,CONNECTIVITY
+3027,What is the command to configure the ISAKMP key for dynamic multipoint VPN in Cisco routers?,,SECURITY
+4083,How do I enable the HTTP-based visibility dashboard for NBAR2 in Cisco IOS?,,MONITORING
+1216,What is the configuration for the Loopback interfaces that must be routed throughout the PIM domain to allow communication with the RP?,,ROUTING
+3623,How can we implement absolute bandwidth for EtherChannel Quality of Service (QoS) to ensure a minimum amount of bandwidth for VLANs?,,QOS
+1332,What command can you use to enable Source Specific Multicast (SSM) range for IP multicast addresses?,,ROUTING
+1131,What are the features of VxLAN GPE tunnel in this configuration?,,CONNECTIVITY
+3554,"How do you set up QoS for telepresence-video, jabber-video, and egress-video-traffic packets that match classification using NBAR on ingress, and apply the same classification on egress?",,QOS
+4144,How can you configure the NAS to accept or reject specific RADIUS attributes?,,SECURITY
+229,How can we ensure that operations in operation group 2 start at evenly distributed intervals within the configured schedule period of 20 seconds?,,GENERAL
+4520,"What is the policing configuration for traffic exceeding the threshold in the ""class-default"" class of the ""parent-policy"" policy map?",,QOS
+2557,How can we enable interchassis asymmetric routing support for zone-based firewall and NAT configuration on Cisco devices?,,SECURITY
+3446,"How do you configure class-maps to classify traffic into different classes, such as voice and video, on a Cisco ASR 1000 Series Aggregation Services Router?",,QOS
+232,"How can we configure the IP SLAs group scheduling to ensure that there are at least 2 operations scheduled within a 10-second window, given a schedule period of 20 seconds?",,MONITORING
+833,How can you exit VFI configuration mode and return to the global configuration mode?,,GENERAL
+1163,What are some examples of multicast address ranges that can be used for predictable behavior and address reuse within smaller domains?,,ROUTING
+4210,What configuration can be used to enable IPsec QoS policies for IPv6 traffic?,,QOS
+290,How can we enable support for users with static IP addresses in public wireless LAN environments?,,CONNECTIVITY
+2480,How can we ensure that sites without registered IP addresses are able to access the network while also integrating with MPLS VPNs?,,CONNECTIVITY
+2528,What command can be used to test the network activity on both devices in an Active/Active failover setup?,,CONNECTIVITY
+3698,How do you calculate the average queue depth at the current enqueue time when using WRED (Weighted Random Early Detection) on an ASR 1000 Router?,,QOS
+110,How can we configure the IP SLAs to support proactive threshold violation monitoring for packet loss and SNMP trap notifications?,,MONITORING
+2273,How do you configure the Source Interface Selection for Outgoing Traffic with Certificate Authority using FastEthernet 1 as the outside interface connected to the Internet Service Provider (ISP) on a Cisco router?,,SECURITY
+924,What are the LACP configuration settings for this network device?,,CONNECTIVITY
+3187,How do you enable IPsec tunnel protection for the hub?,,SECURITY
+3654,How do you configure QoS Packet Policing with Dual-Rate and Three-Color Policer in Cisco router?,,QOS
+3549,What are the current settings for our traffic shaping queue?,,QOS
+580,How can you configure the device to forward multicast traffic when there are no directly connected IGMP hosts?,,ROUTING
+3857,What are the configuration settings for channel-based measurement on the Cisco device?,,MONITORING
+1707,How can we minimize the impact of AAA authentication and authorization by caching responses for given users on the router?,,SECURITY
+2445,How can you enable WAAS for Wide Area Application Services (WAAS) traffic flow optimization in a Cisco IOS XE environment?,,GENERAL
+3431,What is the default interval for sending L2TP hello packets to keep the tunnel alive?,,CONNECTIVITY
+4237,How can you exit the configuration mode in Cisco IOS?,,GENERAL
+2184,What are the Cisco IOS configuration template variables for user1?,,GENERAL
+1901,How can we configure the IP address and speed settings for GigabitEthernet interfaces?,,CONNECTIVITY
+947,How to set up a virtual Ethernet interface on the ASR 1000 platform for terminating IP GRE tunnels?,,CONNECTIVITY
+1213,What can be done to ensure consistent RP selection between Cisco and non-Cisco routers in a PIM Version 2 BSR environment?,,ROUTING
+720,"How can we configure a non-owner interface to automatically receive an IP address from the connected neighbor device, and the owner interface to be assigned a preconfigured auto-IP address with an odd number in the last octet?",,CONNECTIVITY
+38,How do you configure IP SLA operations for multicast jitter measurements?,,MONITORING
+900,How do you configure a port-channel interface before adding interfaces to the channel group?,,CONNECTIVITY
+1193,How can we prevent unwanted sources from disrupting the Internet broadcast and ensure controlled traffic forwarding?,,SECURITY
+1886,"How do you configure IP address, subnet mask, MTU size, NHRP authentication, map entry, multicast support, network ID, hold time, NHS entry, TCP MSS adjustment, load interval, and delay for an interface on a Cisco router?",,ROUTING
+4479,What is the police rate configuration for VoIP traffic in the given policy-map?,,QOS
+3704,What is enabled for queue limits and WRED (Weighted Random Early Detection) on an IOS XE Gibraltar 16.11.x device?,,QOS
+2681,How can we limit the number of VRF firewall sessions in our network?,,SECURITY
+4353,How can we configure LLQ to prioritize specific traffic types while avoiding starvation for non-priority traffic?,,QOS
+2934,What types of threshold values can be used for alarms that require reporting?,,MONITORING
+3521,How does the Max value of the Parent's Schedule Entry affect Bandwidth Sharing in a Cisco IOS configuration?,,QOS
+1921,How can I configure a DMVPN tunnel from BR84 to DMVPN1 (MPLS) using NHRP and multipoint GRE encapsulation?,,ROUTING
+2662,How can you configure the maximum number of half-opened connections per Virtual Routing Forwarding (VRF) to ensure network stability?,,SECURITY
+4510,What is an example of how to configure hierarchical color-aware policing in Cisco IOS XE Release 3.2S or later?,,QOS
+1996,How do I configure the Cisco Umbrella Connector on the branch for OpenDNS validation?,,SECURITY
+2799,How do you attach a firewall policy map to the destination zone pair in a security zone-pair configuration?,,SECURITY
+3361,What are the steps to configure VRRP (Virtual Router Redundancy Protocol) on routers in a group?,,ROUTING
+3458,Question: What is the bandwidth shaping configured for traffic matching the PEER access-group in the grandparent policy map?,,QOS
+248,How do you configure an IP SLAs TWAMP responder to support TWAMP sessions with a control client and session sender on another device?,,MONITORING
+1523,How can I export the packet capture in PCAP format suitable for analysis using any external tool?,,MONITORING
+1056,How can we enable LACP 1-to-1 link redundancy and configure the maximum number of bundles for a Port Aggregator (PoA)?,,CONNECTIVITY
+4460,How do you enable overhead accounting for bandwidth on gaming and class-default classes in a child policy map named subscriber_classes?,,QOS
+853,What is the correct approach to configure maintenance points (MEP) for network devices that are part of a service instance?,,MONITORING
+3052,How can you configure a unique IPv6 link-local address across all DMVPN nodes in a DMVPN network?,,ROUTING
+4011,How can we enable DNS-based learning for NBAR to classify application traffic from the first packet of a flow when the current configuration does not support IP-NBAR classification with DNS learning?,,QOS
+327,How can I enter the global configuration mode?,,GENERAL
+951,What is the recommended configuration for Ethernet bridging support as an important Layer 2 service offered on a router as part of an EVC?,,CONNECTIVITY
+1988,How do you configure an Ethernet interface as the direct access interface for Direct Cloud Access in the SaaS-DCA environment?,,CONNECTIVITY
+2517,What type of redundancy is configured for the LAN-LAN topology in this scenario?,,CONNECTIVITY
+3958,How can you exit the interface configuration mode and return to global configuration mode?,,GENERAL
+97,How do you configure an IP SLA operation as an LSP ping operation in Cisco IOS?,,MONITORING
+4108,How can you configure an L2TP tunnel on a Cisco router to connect to a server with IP medium?,,CONNECTIVITY
+4215,How do you specify the QoS group for LLQ in Cisco IOS?,,QOS
+2885,How to setup a system-data profile in Cisco IOS?,,GENERAL
+3766,How do we configure the Transit Hub in PfRv3 to support Transit Site Support?,,ROUTING
+460,How can we establish connectivity between IPv4 and IPv6 hosts using stateless NAT 46?,,CONNECTIVITY
+1324,"To ensure successful reception of multicast traffic from a source, what configuration command can be used to enable RPF verification for that source?",,ROUTING
+3400,How can you enable RTP header compression on an interface?,,QOS
+2626,"What is the purpose of the ""match protocol"" command in the class-map configuration?",,QOS
+963,How can you configure a port channel group number and enter interface configuration mode?,,CONNECTIVITY
+3245,How does the router handle ICMP Redirect messages when forwarding packets to HSRP devices?,,ROUTING
+1961,What command is used to configure the device as a master hub and enter master controller configuration mode?,,GENERAL
+3710,What action is taken when traffic exceeds the PIR?,,QOS
+99,** How can you display the operational status of the LSP discovery groups belonging to an LSP Health Monitor operation?,,MONITORING
+1397,How do you configure the periodic join and prune announcement intervals for a specified interface in IPv6 PIM?,,ROUTING
+2242,"How do I configure my router to recognize RA certificate requests from enrollment request databases with an organizational unit ""ou=ioscs RA"" in the subject name?",,SECURITY
+2513,How do I enter the redundancy application configuration mode to configure application redundancy settings for a redundancy group?,,GENERAL
+376,How can you configure asymmetric routing using VRF on an interface to enable NAT outside and static NAT pool for inside traffic?,,ROUTING
+2659,"What are the average time frame, average threshold, and burst threshold values configured for threat detection of TCP SYN attacks on this Cisco device?",,SECURITY
+1210,How do you configure Anycast RP with a single address to achieve faster IP routing convergence towards the closest RP?,,ROUTING
+4363,How do I configure Low Latency Queueing (LLQ) with Priority Percentage Support on a Cisco device?,,QOS
+1121,What is the load-balance method used for Port-channel1 in the given configuration?,,CONNECTIVITY
+1689,How can we secure the AAA Double Authentication mechanism in our network connections?,,SECURITY
+3189,How can you configure the WAN-facing interfaces for the spokes in your network?,,CONNECTIVITY
+716,How can I check the status of unnumbered interface support on interfaces configured for IP?,,MONITORING
+1509,What is the requirement for indexing objects in a bulk statistics object list?,,MONITORING
+1642,How can we prevent configuring PPP authentication via CHAP if-needed on an interface when a remote device authenticates via standard login procedure and initiates PPP from the EXEC prompt?,,SECURITY
+149,How can we measure the end-to-end response time between Device A and Device B using IP and UDP Echo Operation?,,MONITORING
+2912,What is Cisco Mediatrace and what products does it support?,,MONITORING
+3608,How can you configure a port-channel with load balancing and VLAN manual or main-interface load-balancing command in Cisco IOS XE Release 2.1 or later software?,,CONNECTIVITY
+717,How can the auto-IP feature simplify the process of reconfiguring IP addresses when inserting or removing nodes in a ring topology?,,CONNECTIVITY
+3230,What is the purpose of configuring multiple Hot Standby groups on an interface in HSRP?,,ROUTING
+3396,What are the configurable settings for RTP Header-Compression in Cisco IOS?,,QOS
+3634,What is the policing configuration for P2P traffic?,,QOS
+698,How can you enable IP connectivity on a point-to-point WAN interface without assigning an IP address?,,CONNECTIVITY
+2555,"What is the purpose of setting ""asymmetric-routing always-divert enable"" in an application redundancy group?",,ROUTING
+3,How do I configure the IP Service Level Agreement (SLA) feature on an ASR 920 platform to measure network performance?,,MONITORING
+4098,What is an example of a business-oriented application that uses peer-to-peer technology and has a high priority classification?,,QOS
+858,How do I configure the Ethernet CFM traceroute cache hold-time in minutes?,,MONITORING
+2828,How do we enable Sun RPC ALG support on a Cisco firewall to allow remote procedure call (RPC) traffic to traverse the network?,,SECURITY
+1907,What is the NHRP map for Tunnel100 and what is the next hop IP address?,,ROUTING
+1896,What are the key parameters used to configure the tunnel interface for a DMVPN deployment?,,ROUTING
+4001,What is the minimum Cisco IOS XE release required to support NBAR classification of traffic using multiple methods?,,QOS
+1362,How can you clear the IP multicast routing table and caches in Cisco IOS?,,ROUTING
+1486,How do I enable SNMP Manager feature on Cisco ASR 1000 series routers running Cisco IOS XE Release 2.1?,,MONITORING
+2083,"What is the purpose of the ""TPLUS(00 00 00 42)/0/READ"" command in Cisco IOS?",,GENERAL
+170,"How can I schedule an IP SLAs operation with a specific group number, operation numbers, and life duration?",,MONITORING
+1823,What is the authentication method configured for the specified interface?,,SECURITY
+3715,How can we implement centralized provisioning for our network devices?,,GENERAL
+2327,What is the correct way to configure the DH group identifier for IPSec SA negotiation in Cisco IOS?,,SECURITY
+801,What command can be used to enter privileged EXEC mode?,,GENERAL
+3178,What is the command to enable OSPF under VRF custA with router ID 10.0.0.103?,,ROUTING
+3667,"What is the configuration command to set the offered rate to 13,000 bps and drop rate to 0 bps for the default class, and attach the police-percent policy to a POS OC3 interface?",,QOS
+3216,How can I enable privileged EXEC mode in Cisco IOS?,,GENERAL
+2254,How do you configure PKI Storage for Certificates on a Cisco device?,,SECURITY
+1025,How can you configure the highest LACP priority and specify system MAC address and system priority values for a given redundancy group in Cisco IOS Release 12.2(33)SRE?,,CONNECTIVITY
+86,What is the purpose of monitoring LSP Health using primary and secondary frequencies when testing the status of paths belonging to a group?,,MONITORING
+684,What is the correct command to enable privileged EXEC mode?,,GENERAL
+1832,How do you specify the server group using Cisco IOS commands?,,GENERAL
+4501,How do you configure PPPoE on an interface and apply a QoS policy to PPPoE sessions?,,QOS
+3306,"How do you enable HSRP on an interface with a specified IP address and version, configure the standby group number, and display information about the standby configuration?",,ROUTING
+174,What command can be used to enable privileged EXEC mode?,,GENERAL
