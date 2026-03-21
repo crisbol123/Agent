@@ -1,14 +1,13 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix, classification_report
-import json
 import time
 import os
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
-# DEBE IR PRIMERO, antes de cualquier otro import
+
 ENV_FILE = Path(__file__).resolve().parents[1] / ".env"
 load_dotenv(dotenv_path=ENV_FILE)
 
@@ -58,51 +57,11 @@ df[GROUND_TRUTH_COLUMN] = df[GROUND_TRUTH_COLUMN].astype(str).str.strip().str.up
 # Categorías objetivo (sin GENERAL)
 CATEGORIES = ['ROUTING', 'SECURITY', 'QOS', 'CONNECTIVITY', 'MONITORING']
 
-# Configuración de modelos a evaluar
-MODELS = {
-    # Modelos base actuales
-    'Llama-3.1-8B-Instruct': {
-        'path': 'meta-llama/Llama-3.1-8B-Instruct',
-        'params': '8B'
-    },
-    'Mistral-7B-Instruct': {
-        'path': 'mistralai/Mistral-7B-Instruct-v0.3',
-        'params': '7B'
-    },
-
-    # Pequenos
-    'Llama-3.2-3B-Instruct': {
-        'path': 'meta-llama/Llama-3.2-3B-Instruct',
-        'params': '3B'
-    },
-    'Phi-3.5-mini-instruct': {
-        'path': 'microsoft/Phi-3.5-mini-instruct',
-        'params': 'mini'
-    },
-    'Qwen2.5-3B-Instruct': {
-        'path': 'Qwen/Qwen2.5-3B-Instruct',
-        'params': '3B'
-    },
-
-    # Medianos
-    'Qwen2.5-7B-Instruct': {
-        'path': 'Qwen/Qwen2.5-7B-Instruct',
-        'params': '7B'
-    },
-    'Gemma-2-9B-it': {
-        'path': 'google/gemma-2-9b-it',
-        'params': '9B'
-    },
-
-    # Grandes
-    'Qwen2.5-14B-Instruct': {
-        'path': 'Qwen/Qwen2.5-14B-Instruct',
-        'params': '14B'
-    },
-    'Phi-4': {
-        'path': 'microsoft/phi-4',
-        'params': 'N/A'
-    }
+# Modelo a evaluar (solo Gemma)
+MODEL_NAME = 'Gemma-2-7B-it'
+MODEL_CONFIG = {
+    'path': 'google/gemma-7b-it',
+    'params': '7B'
 }
 
 # Prompt template para clasificación
@@ -255,18 +214,18 @@ def classify_with_slm(question, tokenizer, model):
 
 def evaluate_model(model_name, model_config, df_sample):
     """
-    Evalúa un modelo completo
+    Evalúa Gemma (prueba rápida)
     """
     print(f"\n{'='*80}")
-    print(f"EVALUANDO: {model_name} ({model_config['params']})")
+    print(f"PRUEBA GEMMA: {model_name} ({model_config['params']})")
     print(f"{'='*80}")
     
     # Cargar modelo
     tokenizer, model = load_model(model_name, model_config)
     
     if tokenizer is None or model is None:
-        print(f"Saltando {model_name} - No se pudo cargar")
-        return None
+        print(f"Error: No se pudo cargar {model_name}")
+        return
     
     # Clasificar cada ejemplo
     predictions = []
@@ -310,33 +269,10 @@ def evaluate_model(model_name, model_config, df_sample):
     )
     robust_metrics = compute_robust_metrics(conf_matrix)
     
-    results = {
-        'model_name': model_name,
-        'params': model_config['params'],
-        'accuracy': accuracy,
-        'precision': float(precision),
-        'recall': float(recall),
-        'f1_score': float(f1),
-        'macro_precision': float(macro_precision_skl),
-        'macro_recall': float(macro_recall_skl),
-        'macro_f1': float(macro_f1_skl),
-        'balanced_accuracy': robust_metrics['balanced_accuracy'],
-        'worst_class_recall': robust_metrics['worst_class_recall'],
-        'robust_score': robust_metrics['robust_score'],
-        'unknown_count': int(unknown_count),
-        'unknown_rate': float(unknown_count / len(df_sample)),
-        'elapsed_time': elapsed_time,
-        'samples_evaluated': len(df_sample),
-        'avg_time_per_sample': elapsed_time / len(df_sample),
-        'classification_report': report,
-        'confusion_matrix': conf_matrix.tolist(),
-        'confusion_matrix_normalized': conf_matrix_normalized.tolist(),
-        'per_class_precision': robust_metrics['per_class_precision'],
-        'per_class_recall': robust_metrics['per_class_recall'],
-        'per_class_f1': robust_metrics['per_class_f1'],
-    }
-    
-    print(f"\nResultados para {model_name}:")
+    # Mostrar resultados en consola
+    print(f"\n{'='*80}")
+    print(f"RESULTADOS PARA {model_name}:")
+    print(f"{'='*80}")
     print(f"  Accuracy: {accuracy:.4f}")
     print(f"  Precision (weighted): {precision:.4f}")
     print(f"  Recall (weighted): {recall:.4f}")
@@ -349,16 +285,32 @@ def evaluate_model(model_name, model_config, df_sample):
     print(f"  Tiempo total: {elapsed_time:.2f}s")
     print(f"  Tiempo promedio por muestra: {elapsed_time/len(df_sample):.2f}s")
     
-    return results
+    print(f"\n{'='*80}")
+    print("CLASIFICACIÓN POR CATEGORÍA:")
+    print(f"{'='*80}")
+    print(report)
+    
+    print(f"\n{'='*80}")
+    print("MATRIZ DE CONFUSIÓN (Normalizada):")
+    print(f"{'='*80}")
+    print("Predicho →")
+    print("Real ↓")
+    # Encabezados
+    print("  " + "  ".join(f"{cat:12}" for cat in CATEGORIES))
+    for i, cat in enumerate(CATEGORIES):
+        print(f"{cat:2}", end=" ")
+        for j in range(len(CATEGORIES)):
+            print(f"{conf_matrix_normalized[i][j]:12.2%}", end="")
+        print()
 
 def main():
     """
-    Función principal de evaluación
+    Función principal - Prueba rápida de Gemma
     """
     print("="*80)
-    print("EVALUACION DE CLASIFICACION - 5 SLMs")
+    print("PRUEBA RÁPIDA - EVALUACION GEMMA")
     print("="*80)
-    print(f"Dataset prefiltrado sin {EXCLUDED_CATEGORY}: {DATASET_FILE}")
+    print(f"Dataset: {DATASET_FILE}")
     
     # Mostrar distribución real del dataset
     print(f"\nDataset cargado: {len(df)} muestras")
@@ -367,48 +319,12 @@ def main():
     print(category_distribution)
     print()
     
-    # Evaluar cada modelo
-    all_results = []
-    
-    for model_name, model_config in MODELS.items():
-        result = evaluate_model(model_name, model_config, df)
-        if result:
-            all_results.append(result)
-        
-        # Liberar VRAM entre modelos
-        import gc, torch
-        gc.collect()
-        torch.cuda.empty_cache()
-        print(f"VRAM liberada. Libre: {torch.cuda.memory_reserved(0)/1024**3:.2f} GB")
-    
-    # Guardar resultados
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    results_file = f"classification_results_{timestamp}.json"
-    
-    # Agregar información del dataset usado
-    evaluation_info = {
-        'timestamp': timestamp,
-        'total_samples': len(df),
-        'samples_per_category': int(category_distribution.min()),
-        'categories': CATEGORIES,
-        'models_evaluated': list(MODELS.keys()),
-        'results': all_results
-    }
-    
-    with open(results_file, 'w') as f:
-        json.dump(evaluation_info, f, indent=2)
+    # Evaluar Gemma
+    evaluate_model(MODEL_NAME, MODEL_CONFIG, df)
     
     print(f"\n{'='*80}")
-    print(f"RESULTADOS GUARDADOS EN: {results_file}")
+    print("PRUEBA COMPLETADA - Sin exportación de JSON")
     print(f"{'='*80}")
-    
-    # Mostrar comparación final
-    print("\nCOMPARACION FINAL:")
-    print(f"{'Modelo':<30} {'Macro-F1':<12} {'Robust':<12} {'Tiempo (s)':<12}")
-    print("-"*80)
-    
-    for result in sorted(all_results, key=lambda x: x['robust_score'], reverse=True):
-        print(f"{result['model_name']:<30} {result['macro_f1']:<12.4f} {result['robust_score']:<12.4f} {result['elapsed_time']:<12.2f}")
 
 if __name__ == "__main__":
     main()
