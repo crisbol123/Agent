@@ -69,6 +69,10 @@ MODELS = {
         'path': 'mistralai/Mistral-7B-Instruct-v0.3',
         'params': '7B'
     },
+    'Zephyr-7B': {
+        'path': 'HuggingFaceH4/zephyr-7b-beta',
+        'params': '7B'
+    },
 
     # Pequenos
     'Llama-3.2-3B-Instruct': {
@@ -159,7 +163,6 @@ def compute_robust_metrics(conf_matrix):
     macro_f1 = float(np.mean(per_class_f1))
     balanced_accuracy = macro_recall
     worst_class_recall = float(np.min(per_class_recall))
-    robust_score = float(0.5 * macro_f1 + 0.3 * balanced_accuracy + 0.2 * worst_class_recall)
 
     return {
         'macro_precision': macro_precision,
@@ -167,7 +170,6 @@ def compute_robust_metrics(conf_matrix):
         'macro_f1': macro_f1,
         'balanced_accuracy': balanced_accuracy,
         'worst_class_recall': worst_class_recall,
-        'robust_score': robust_score,
         'per_class_precision': per_class_precision.tolist(),
         'per_class_recall': per_class_recall.tolist(),
         'per_class_f1': per_class_f1.tolist(),
@@ -200,7 +202,7 @@ def load_model(model_name, model_config):
         )
         model = AutoModelForCausalLM.from_pretrained(
             model_config['path'],
-            torch_dtype=torch.bfloat16,
+            dtype=torch.bfloat16,
             device_map=device,
             trust_remote_code=model_config.get('trust_remote_code', False),
             cache_dir=HF_HUB_CACHE_DIR,
@@ -228,7 +230,9 @@ def classify_with_slm(question, tokenizer, model):
             **inputs,
             max_new_tokens=15,
             do_sample=False,
-            pad_token_id=tokenizer.eos_token_id
+            pad_token_id=tokenizer.eos_token_id,
+            temperature=None,
+            top_p=None,     
         )
 
         raw = tokenizer.decode(
@@ -322,7 +326,6 @@ def evaluate_model(model_name, model_config, df_sample):
         'macro_f1': float(macro_f1_skl),
         'balanced_accuracy': robust_metrics['balanced_accuracy'],
         'worst_class_recall': robust_metrics['worst_class_recall'],
-        'robust_score': robust_metrics['robust_score'],
         'unknown_count': int(unknown_count),
         'unknown_rate': float(unknown_count / len(df_sample)),
         'elapsed_time': elapsed_time,
@@ -344,7 +347,6 @@ def evaluate_model(model_name, model_config, df_sample):
     print(f"  Macro-F1: {macro_f1_skl:.4f}")
     print(f"  Balanced Accuracy: {robust_metrics['balanced_accuracy']:.4f}")
     print(f"  Worst-class Recall: {robust_metrics['worst_class_recall']:.4f}")
-    print(f"  Robust Score: {robust_metrics['robust_score']:.4f}")
     print(f"  Unknown rate: {unknown_count/len(df_sample):.2%}")
     print(f"  Tiempo total: {elapsed_time:.2f}s")
     print(f"  Tiempo promedio por muestra: {elapsed_time/len(df_sample):.2f}s")
@@ -404,11 +406,11 @@ def main():
     
     # Mostrar comparación final
     print("\nCOMPARACION FINAL:")
-    print(f"{'Modelo':<30} {'Macro-F1':<12} {'Robust':<12} {'Tiempo (s)':<12}")
+    print(f"{'Modelo':<30} {'Macro-F1':<12} {'Tiempo (s)':<12}")
     print("-"*80)
     
-    for result in sorted(all_results, key=lambda x: x['robust_score'], reverse=True):
-        print(f"{result['model_name']:<30} {result['macro_f1']:<12.4f} {result['robust_score']:<12.4f} {result['elapsed_time']:<12.2f}")
+    for result in sorted(all_results, key=lambda x: x['macro_f1'], reverse=True):
+        print(f"{result['model_name']:<30} {result['macro_f1']:<12.4f} {result['elapsed_time']:<12.2f}")
 
 if __name__ == "__main__":
     main()
