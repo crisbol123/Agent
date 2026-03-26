@@ -1,0 +1,10 @@
+{
+  "hostname": "h1",
+  "hostInterfaces": {
+    "eth0": {
+      "name": "eth0",
+      "prefix": "10.0.1.10/24",
+      "gateway": "10.0.1.1"
+    }
+  }
+}

@@ -1,0 +1,344 @@
+requirement,model_answer,completion_action,model_answer_completed,model_raw_output
+Configure routing protocol between Router2 and Router3,"    ```
+    Router2# configure terminal
+    Router2(config)# router ospfv3 1
+    Router2(config-router)# network 2001:db8:12",NO_CODE,NO_CODE,"{
+  ""action"": ""NO_CODE"",
+  ""completed_answer"": ""NO_CODE""
+}"
+Deny FTP traffic from Router1 to external networks,"    ```
+    Router1(config)# ip access-list extended DENY_FTP
+    Router1(config-ext-nacl)# deny ftp any any
+    Router1(config-ext-nacl)# exit
+    Router1(config)# interface fastethernet 0/0
+    Router1(config-if)# ip access-group DENY_FTP in
+    ```",COMPLETED,"Router1(config)# ip access-list extended DENY_FTP
+Router1(config-ext-nacl)# deny tcp any eq ftp any eq ftp
+Router1(config-ext-nacl)# exit
+Router1(config)# interface fastethernet 0/0
+Router1(config-if)# ip access-group DENY_FTP in
+Router1(config-if)# exit","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""Router1(config)# ip access-list extended DENY_FTP\nRouter1(config-ext-nacl)# deny tcp any eq ftp any eq ftp\nRouter1(config-ext-nacl)# exit\nRouter1(config)# interface fastethernet 0/0\nRouter1(config-if)# ip access-group DENY_FTP in\nRouter1(config-if)# exit""
+}"
+Enable interfaces giga0/0 on Router2 and Router4,"    ```
+    Router2# configure terminal
+    Router2(config)# interface gigabitethernet 0/0
+    Router2(config-if)# ip address 192.168.1.2 255.255.255.0
+    Router2(config-if)# encapsulation dot1q 100
+    Router2(config-if)# exit
+
+    Router4# configure terminal
+    Router4(config)# interface gigabitethernet ",COMPLETED,"Router2# configure terminal
+Router2(config)# interface gigabitethernet 0/0
+Router2(config-if)# ip address 192.168.1.2 255.255.255.0
+Router2(config-if)# encapsulation dot1q 100
+Router2(config-if)# no shutdown
+Router2(config-if)# exit
+
+Router4# configure terminal
+Router4(config)# interface gigabitethernet 0/0
+Router4(config-if)# ip address 192.168.1.3 255.255.255.0
+Router4(config-if)# encapsulation dot1q 100
+Router4(config-if)# no shutdown
+Router4(config-if)# exit","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""    \nRouter2# configure terminal\nRouter2(config)# interface gigabitethernet 0/0\nRouter2(config-if)# ip address 192.168.1.2 255.255.255.0\nRouter2(config-if)# encapsulation dot1q 100\nRouter2(config-if)# no shutdown\nRouter2(config-if)# exit\n\nRouter4# configure terminal\nRouter4(config)# interface gigabitethernet 0/0\nRouter4(config-if)# ip address 192.168.1.3 255.255.255.0\nRouter4(config-if)# encapsulation dot1q 100\nRouter4(config-if)# no shutdown\nRouter4(config-if)# exit""
+}"
+Configure Router1 to prioritize VoIP traffic based on DSCP markings.,"    ~~~Router1~~~~
+    ip cef
+    mpls traffic-eng
+    mpls ldp
+    mpls nhrp
+    mpls nhrp map 10.1.1.1 10.1.1.2
+    mpls nhrp network-id 10.1.1.0
+    mpls nhrp holdtime 300
+    mpls nhrp authentication cisco
+    mpls nhrp map-group 10.1.1.0
+    mpls nhrp map",COMPLETED,"ip cef
+mpls traffic-eng
+mpls ldp
+mpls nhrp
+mpls nhrp map 10.1.1.1 10.1.1.2
+mpls nhrp network-id 10.1.1.0
+mpls nhrp holdtime 300
+mpls nhrp authentication cisco
+mpls nhrp map-group 10.1.1.0
+!
+!
+interface Ethernet0/0
+ ip address 10.0.1.0 255.255.255.0
+ no shutdown
+!
+interface Ethernet0/1
+ ip address 10.0.12.1 255.255.255.0
+ no shutdown
+!
+interface Ethernet0/2
+ ip address 10.0.14.1 255.255.255.0
+ no shutdown
+!
+!
+routing-policy VOIP_TRAFFIC
+ if-match dscp ef
+!
+!
+policy-map QOS_POLICY
+ class class-default
+ police cir 30000 bc 600 be 150 conform-action transmit exceed-action drop
+!
+!
+policy-map interface output Ethernet0/0
+ service-policy output QOS_POLICY
+!
+policy-map interface output Ethernet0/1
+ service-policy output QOS_POLICY
+!
+policy-map interface output Ethernet0/2
+ service-policy output QOS_POLICY
+!","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""ip cef\nmpls traffic-eng\nmpls ldp\nmpls nhrp\nmpls nhrp map 10.1.1.1 10.1.1.2\nmpls nhrp network-id 10.1.1.0\nmpls nhrp holdtime 300\nmpls nhrp authentication cisco\nmpls nhrp map-group 10.1.1.0\n!\n!\ninterface Ethernet0/0\n ip address 10.0.1.0 255.255.255.0\n no shutdown\n!\ninterface Ethernet0/1\n ip address 10.0.12.1 255.255.255.0\n no shutdown\n!\ninterface Ethernet0/2\n ip address 10.0.14.1 255.255.255.0\n no shutdown\n!\n!\nrouting-policy VOIP_TRAFFIC\n if-match dscp ef\n!\n!\npolicy-map QOS_POLICY\n class class-default\n police cir 30000 bc 600 be 150 conform-action transmit exceed-action drop\n!\n!\npolicy-map interface output Ethernet0/0\n service-policy output QOS_POLICY\n!\npolicy-map interface output Ethernet0/1\n service-policy output QOS_POLICY\n!\npolicy-map interface output Ethernet0/2\n service-policy output QOS_POLICY\n!""
+}"
+Set up Router4 to throttle P2P traffic to prevent it from consuming excessive bandwidth.,"    ~~~Router4~~~~
+    class-map match-any p2p-traffic
+      match protocol p2p
+    policy-map throttle-p2p
+      class p2p-traffic
+        police rate 10000000 bps
+    interface FastEthernet0/0
+      service-policy input throttle-p2p",COMPLETED,"class-map match-any p2p-traffic
+  match protocol p2p
+policy-map throttle-p2p
+  class p2p-traffic
+    police rate 10000000 bps burst 64000 conform-action transmit exceed-action drop
+interface Ethernet0/0
+  service-policy input throttle-p2p","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""class-map match-any p2p-traffic\n  match protocol p2p\npolicy-map throttle-p2p\n  class p2p-traffic\n    police rate 10000000 bps burst 64000 conform-action transmit exceed-action drop\ninterface Ethernet0/0\n  service-policy input throttle-p2p""
+}"
+Implement Class-Based Weighted Fair Queuing (CBWFQ) on Router3 for LAN traffic.,"    ```cisco
+    ~~~Router3~~~~
+    class-map match-any LAN_TRAFFIC
+      match ip dscp ef
+    policy-map LAN_POLICY
+      class LAN_TRAFFIC
+        priority 10000
+    service-policy input LAN_POLICY
+    ```",COMPLETED,"class-map match-any LAN_TRAFFIC
+  match ip dscp ef
+policy-map LAN_POLICY
+  class LAN_TRAFFIC
+    priority 10000
+  class class-default
+    fair-queue bandwidth 50 queue-limit 200
+service-policy output LAN_POLICY","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""class-map match-any LAN_TRAFFIC\n  match ip dscp ef\npolicy-map LAN_POLICY\n  class LAN_TRAFFIC\n    priority 10000\n  class class-default\n    fair-queue bandwidth 50 queue-limit 200\nservice-policy output LAN_POLICY""
+}"
+Implement IPv6 addressing on Router1's WAN interface,"    ```
+    Router1# configure terminal
+    Router1(config)# interface fastethernet 0/0
+    Router1(config-if)# ipv6 address 2001:DB8:123",COMPLETED,"Router1# configure terminal
+Router1(config)# interface fastethernet 0/0
+Router1(config-if)# ipv6 address 2001:DB8:123:45::1/64","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""Router1# configure terminal\nRouter1(config)# interface fastethernet 0/0\nRouter1(config-if)# ipv6 address 2001:DB8:123:45::1/64""
+}"
+Configure routing protocol between Router1 and Router3,"    ```
+    Router1# configure terminal
+    Router1(config)# router ospfv3 1
+    Router1(config-router)# network 192.168.1.0/24 area 0
+    Router1(config-router)# cost 10
+    Router1(config-router",NO_CODE,NO_CODE,"{
+  ""action"": ""NO_CODE"",
+  ""completed_answer"": ""NO_CODE""
+}"
+Increase the bandwidth of Router1's WAN interface to accommodate more traffic,"    ```
+    Router1# configure terminal
+    Router1(config)# interface fastethernet 0/0
+    Router1(config-if)# bandwidth 10000
+    Router1(config-if)# exit
+    Router1(config)#
+    ```",COMPLETED,"Router1# configure terminal
+Router1(config)# interface fastethernet 0/0
+Router1(config-if)# bandwidth 10000
+Router1(config-if)# exit
+Router1(config)## Interface Ethernet0/0 is not a FastEthernet interface. Correcting to Ethernet0/0.
+Router1(config)# interface ethernet 0/0
+Router1(config-if)# bandwidth 10000
+Router1(config-if)# exit
+Router1(config)#","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""Router1# configure terminal\nRouter1(config)# interface fastethernet 0/0\nRouter1(config-if)# bandwidth 10000\nRouter1(config-if)# exit\nRouter1(config)## Interface Ethernet0/0 is not a FastEthernet interface. Correcting to Ethernet0/0.\nRouter1(config)# interface ethernet 0/0\nRouter1(config-if)# bandwidth 10000\nRouter1(config-if)# exit\nRouter1(config)#""
+}"
+Configure the network interface to use Ethernet encapsulation connected to a Eheternet 802.3 network. Ensure that the interface is set to the Ethernet encapsulation type and that it is properly assigned an IP address and subnet mask consistent with Ethernet standards.,"    ~~~device_name~~~~
+    interface Ethernet0/0
+     encapsulation dot1q 10
+     ip address 192.168.1.100 255.25",NO_CODE,NO_CODE,"{
+  ""action"": ""NO_CODE"",
+  ""completed_answer"": ""NO_CODE""
+}"
+Implement Port Address Translation (PAT) on Router1 for outbound internet access,"    ```
+    Router1# configure terminal
+    Router1(config)# ip nat inside
+    Router1(config)# ip nat outside
+    Router1(config)# interface FastEthernet0/0
+    Router1(config-if)# ip address 192.168.1.1 255.255.255.0
+    Router1(config-if)# no shutdown
+    Router1(config-if)# exit
+    Router1(config)# ip nat pool 10.0.0.1 ",COMPLETED,"Router1# configure terminal
+Router1(config)# ip nat inside source list 1 pool 10.0.14.1-10.0.14.10 overload
+Router1(config)# access-list 1 permit 10.0.1.0 0.0.0.255
+Router1(config)# interface Ethernet0/0
+Router1(config-if)# ip nat inside
+Router1(config-if)# exit
+Router1(config)# interface Ethernet0/1
+Router1(config-if)# ip nat outside
+Router1(config-if)# exit
+Router1(config)# interface Ethernet0/2
+Router1(config-if)# ip nat outside
+Router1(config-if)# exit
+Router1(config)# ip nat pool 10.0.14.1-10.0.14.10 10.0.14.1 10.0.14.10 prefix-length 24","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""Router1# configure terminal\nRouter1(config)# ip nat inside source list 1 pool 10.0.14.1-10.0.14.10 overload\nRouter1(config)# access-list 1 permit 10.0.1.0 0.0.0.255\nRouter1(config)# interface Ethernet0/0\nRouter1(config-if)# ip nat inside\nRouter1(config-if)# exit\nRouter1(config)# interface Ethernet0/1\nRouter1(config-if)# ip nat outside\nRouter1(config-if)# exit\nRouter1(config)# interface Ethernet0/2\nRouter1(config-if)# ip nat outside\nRouter1(config-if)# exit\nRouter1(config)# ip nat pool 10.0.14.1-10.0.14.10 10.0.14.1 10.0.14.10 prefix-length 24""
+}"
+Implement Access Control Lists (ACLs) on Router1 to filter inbound traffic,"    ~~~Router1~~~~
+    access-list 101 permit ip 192.168.1.0 0.0.0.255 any
+    access-list 101 deny ip any any
+    interface fastethernet 0/0
+    ip address 192",COMPLETED,"~~~Router1~~~~
+access-list 101 permit ip 192.168.1.0 0.0.0.255 any
+access-list 101 deny ip any any
+interface fastethernet 0/0
+ip address 10.0.1.1 255.255.255.0
+ip access-group 101 in
+no shutdown","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""~~~Router1~~~~\naccess-list 101 permit ip 192.168.1.0 0.0.0.255 any\naccess-list 101 deny ip any any\ninterface fastethernet 0/0\nip address 10.0.1.1 255.255.255.0\nip access-group 101 in\nno shutdown""
+}"
+Enable interfaces giga0/0 on Router3 and Router4,"    ```
+    Router3# configure terminal
+    Router3(config)# interface gigabitethernet 0/0
+    Router3(config-if)# ip address 192.168.1.3 255.255.255.0
+    Router3(config-",COMPLETED,"Router3# configure terminal
+Router3(config)# interface gigabitethernet 0/0
+Router3(config-if)# ip address 192.168.1.3 255.255.255.0
+Router3(config-if)# no shutdown
+Router3(config-if)# exit
+Router3(config)# interface gigabitethernet 0/1
+Router3(config-if)# no shutdown
+Router3(config-if)# exit
+Router3(config)#
+Router4# configure terminal
+Router4(config)# interface gigabitethernet 0/0
+Router4(config-if)# ip address 192.168.1.4 255.255.255.0
+Router4(config-if)# no shutdown
+Router4(config-if)# exit
+Router4(config)# interface gigabitethernet 0/1
+Router4(config-if)# no shutdown
+Router4(config-if)# exit
+Router4(config)#","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""Router3# configure terminal\nRouter3(config)# interface gigabitethernet 0/0\nRouter3(config-if)# ip address 192.168.1.3 255.255.255.0\nRouter3(config-if)# no shutdown\nRouter3(config-if)# exit\nRouter3(config)# interface gigabitethernet 0/1\nRouter3(config-if)# no shutdown\nRouter3(config-if)# exit\nRouter3(config)#\nRouter4# configure terminal\nRouter4(config)# interface gigabitethernet 0/0\nRouter4(config-if)# ip address 192.168.1.4 255.255.255.0\nRouter4(config-if)# no shutdown\nRouter4(config-if)# exit\nRouter4(config)# interface gigabitethernet 0/1\nRouter4(config-if)# no shutdown\nRouter4(config-if)# exit\nRouter4(config)#""
+}"
+Implement BGP routing protocol on Router1 for external connectivity,"    - Use AS 65000 as the autonomous system number.
+    - Configure Router1 as a BGP router with IP address 10.1.1.1 and subnet mask 255.255.255.0.
+    - Set the BGP router ID to 10.1.1.1.
+    - Configure Router1 to advertise its IP address 10.1.1.1 as a BGP neighbor.
+    - Configure Router1 to receive BGP updates from Router2 (IP address 10.2.2.2) and Router3 (IP",COMPLETED,"router bgp 65000
+bgp router-id 10.0.1.1
+network 10.0.1.0 mask 255.255.255.0
+neighbor 10.0.12.2 remote-as 65000
+eighbor 10.0.14.2 remote-as 65000","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""router bgp 65000\nbgp router-id 10.0.1.1\nnetwork 10.0.1.0 mask 255.255.255.0\nneighbor 10.0.12.2 remote-as 65000\neighbor 10.0.14.2 remote-as 65000""
+}"
+Permit SNMP traps from Router3 to Management Network,"    ```cisco
+    Router3# configure terminal
+    Router3(config)# snmp-server enable traps
+    Router3(config)# snmp-server host 10.1.1.0 161
+    Router3(config)# snmp-server trap-source Loopback0
+    Router3(config)# snmp-server trap-group 10.1.1.0
+    Router3(config)# exit
+    ```",COMPLETED,"Router3# configure terminal
+Router3(config)# snmp-server enable traps
+Router3(config)# snmp-server host 10.0.2.10 version 2c public
+Router3(config)# snmp-server trap-source Ethernet0/2
+Router3(config)# exit","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""Router3# configure terminal\nRouter3(config)# snmp-server enable traps\nRouter3(config)# snmp-server host 10.0.2.10 version 2c public\nRouter3(config)# snmp-server trap-source Ethernet0/2\nRouter3(config)# exit""
+}"
+Globally disable proxy ARP,"    ~~~device1~~~~
+    no ip proxy-arp
+    ~~~device2~~~~
+    no ip proxy-arp
+    �",COMPLETED,no ip proxy-arp,"{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""no ip proxy-arp""
+}"
+Enable interfaces giga0/0 on Router4 and Router2,"    ```
+    Router4# configure terminal
+    Router4(config)# interface gigabitethernet 0/0
+    Router4(config-if)# ip address 10.1.1.4 255.255.255.0
+    Router4(config-if)# bandwidth 1000000000
+    Router4(config-if)# exit
+    Router4#
+
+    Router2# configure",COMPLETED,"Router4# configure terminal
+Router4(config)# interface gigabitethernet 0/0
+Router4(config-if)# ip address 10.0.14.2 255.255.255.0
+Router4(config-if)# bandwidth 1000000000
+Router4(config-if)# no shutdown
+Router4(config-if)# exit
+Router4#
+
+Router2# configure terminal
+Router2(config)# interface gigabitethernet 0/0
+Router2(config-if)# ip address 10.0.12.2 255.255.255.0
+Router2(config-if)# bandwidth 1000000000
+Router2(config-if)# no shutdown
+Router2(config-if)# exit
+Router2#","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""    \nRouter4# configure terminal\nRouter4(config)# interface gigabitethernet 0/0\nRouter4(config-if)# ip address 10.0.14.2 255.255.255.0\nRouter4(config-if)# bandwidth 1000000000\nRouter4(config-if)# no shutdown\nRouter4(config-if)# exit\nRouter4#\n\nRouter2# configure terminal\nRouter2(config)# interface gigabitethernet 0/0\nRouter2(config-if)# ip address 10.0.12.2 255.255.255.0\nRouter2(config-if)# bandwidth 1000000000\nRouter2(config-if)# no shutdown\nRouter2(config-if)# exit\nRouter2#""
+}"
+Enable interfaces giga0/1 on Router4 and Router3,"    ```
+    Router4# configure terminal
+    Router4(config)# interface gigabitethernet 0/1
+    Router4(config-if)# ip address 10.1.1.4 255.255.255.0
+    Router4(config-if)# bandwidth 1000000000
+    Router3# configure terminal
+    Router3(config)# interface gigabitethernet 0/",COMPLETED,"Router4# configure terminal
+    Router4(config)# interface gigabitethernet 0/1
+    Router4(config-if)# ip address 10.1.1.4 255.255.255.0
+    Router4(config-if)# bandwidth 1000000000
+    Router3# configure terminal
+    Router3(config)# interface gigabitethernet 0/1
+    Router3(config-if)# ip address 10.1.1.3 255.255.255.0
+    Router3(config-if)# bandwidth 1000000000","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""    Router4# configure terminal\n    Router4(config)# interface gigabitethernet 0/1\n    Router4(config-if)# ip address 10.1.1.4 255.255.255.0\n    Router4(config-if)# bandwidth 1000000000\n    Router3# configure terminal\n    Router3(config)# interface gigabitethernet 0/1\n    Router3(config-if)# ip address 10.1.1.3 255.255.255.0\n    Router3(config-if)# bandwidth 1000000000""
+}"
+Add a new VLAN to Router3's LAN interface for network segmentation,"    ```
+    Router3# configure terminal
+    Router",COMPLETED,"Router3# configure terminal
+Router3(config)# vlan 10
+Router3(config-vlan)# exit
+Router3(config)# interface Ethernet0/2
+Router3(config-if)# ip address 192.168.10.1 255.255.255.0
+Router3(config-if)# no shutdown
+Router3(config-if)# exit","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""Router3# configure terminal\nRouter3(config)# vlan 10\nRouter3(config-vlan)# exit\nRouter3(config)# interface Ethernet0/2\nRouter3(config-if)# ip address 192.168.10.1 255.255.255.0\nRouter3(config-if)# no shutdown\nRouter3(config-if)# exit""
+}"
+Change the priority of Router3 in the OSPF network,"    ```
+    Router3# configure terminal
+    Router3(config)# router ospf 1
+    Router3(config-router)# priority 100
+    ```",COMPLETED,"Router3# configure terminal
+Router3(config)# router ospf 1
+Router3(config-router)# priority 100","{
+  ""action"": ""COMPLETED"",
+  ""completed_answer"": ""Router3# configure terminal\nRouter3(config)# router ospf 1\nRouter3(config-router)# priority 100""
+}"

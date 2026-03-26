@@ -1,0 +1,54 @@
+{
+  "edges": [
+
+    {
+      "node1": "h1",
+      "interface1": "eth0",
+      "node2": "R1",
+      "interface2": "Ethernet0/0"
+    },
+
+    {
+      "node1": "R1",
+      "interface1": "Ethernet0/1",
+      "node2": "R2",
+      "interface2": "Ethernet0/0"
+    },
+
+    {
+      "node1": "R1",
+      "interface1": "Ethernet0/2",
+      "node2": "R4",
+      "interface2": "Ethernet0/0"
+    },
+
+    {
+      "node1": "R2",
+      "interface1": "Ethernet0/1",
+      "node2": "R3",
+      "interface2": "Ethernet0/0"
+    },
+
+    {
+      "node1": "R2",
+      "interface1": "Ethernet0/2",
+      "node2": "R4",
+      "interface2": "Ethernet0/1"
+    },
+
+    {
+      "node1": "R3",
+      "interface1": "Ethernet0/1",
+      "node2": "R4",
+      "interface2": "Ethernet0/2"
+    },
+
+    {
+      "node1": "R3",
+      "interface1": "Ethernet0/2",
+      "node2": "h2",
+      "interface2": "eth0"
+    }
+
+  ]
+}

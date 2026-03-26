@@ -25,7 +25,7 @@ Globally disable proxy ARP,"    ~~~device1~~~~
     no ip proxy-arp
     ~~~device2~~~~
     no ip proxy-arp
-    …"
+    ï¿½"
 Disabling Proxy ARP on interface gigabit1/0/1,"    ```cisco
     ~~~gigabit1/0/1~~~
     no ip proxy-arp
@@ -344,7 +344,7 @@ Allow HTTP traffic from LAN to WAN on Router1,"    ~~~Router1~~~~
     exit"
 Permit ICMP echo requests from Router3 LAN to Router2 LAN,"    ```
     Router3# configure terminal
-    Router3(config)# ip access-list standard permit-icmp-echo-req
+    Router3(config)# ip access-list standar  d permit-icmp-echo-req
     Router3(config-std-acl)# permit icmp any any echo
     Router3(config-std-acl)# exit
     Router3(config)# interface fastethernet 0/0
