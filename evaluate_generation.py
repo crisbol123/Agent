@@ -28,7 +28,7 @@ HF_HUB_CACHE_DIR = r"D:\huggingface\hub"
 os.makedirs(HF_HUB_CACHE_DIR, exist_ok=True)
 
 # ── Dataset ───────────────────────────────────────────────────────────────────
-DATASET_FILE = os.path.join(os.path.dirname(__file__), "generated_answers_cleaned.csv")
+DATASET_FILE = os.path.join(os.path.dirname(__file__), "dataset_v2.csv")
 
 if not os.path.exists(DATASET_FILE):
     raise FileNotFoundError(
@@ -39,10 +39,13 @@ if not os.path.exists(DATASET_FILE):
     )
 
 print(f"Cargando dataset: {DATASET_FILE}")
-df = pd.read_csv(DATASET_FILE, encoding="latin1")
+try:
+    df = pd.read_csv(DATASET_FILE, encoding="utf-8")
+except UnicodeDecodeError:
+    df = pd.read_csv(DATASET_FILE, encoding="latin1")
 
 REQUIREMENT_COL  = "requirement"   # el intent / prompt
-GROUND_TRUTH_COL = "model_answer"  # configuracion de referencia (ground truth)
+GROUND_TRUTH_COL = "ground_truth"  # configuracion de referencia (ground truth)
 
 assert REQUIREMENT_COL  in df.columns, f"Columna '{REQUIREMENT_COL}' no encontrada"
 assert GROUND_TRUTH_COL in df.columns, f"Columna '{GROUND_TRUTH_COL}' no encontrada"
@@ -51,41 +54,72 @@ print(f"Muestras cargadas: {len(df)}")
 
 # ── Modelos (mismos del PDF, mismos paths que clasificacion) ──────────────────
 MODELS = {
-    "Zephyr-7B": {
-        "path":   "HuggingFaceH4/zephyr-7b-beta",
-        "params": "7B",
+    # Modelos base actuales
+    'Llama-3.1-8B-Instruct': {
+        'path': 'meta-llama/Llama-3.1-8B-Instruct',
+        'params': '8B'
     },
-    "Llama-3.2-3B-Instruct": {
-        "path":   "meta-llama/Llama-3.2-3B-Instruct",
-        "params": "3B",
+    'Zephyr-7B': {
+        'path': 'HuggingFaceH4/zephyr-7b-beta',
+        'params': '7B'
     },
-    "Phi-3.5-mini-instruct": {
-        "path":   "microsoft/Phi-3.5-mini-instruct",
-        "params": "3.8B",
+
+    # Medianos
+    'Qwen2.5-7B-Instruct': {
+        'path': 'Qwen/Qwen2.5-7B-Instruct',
+        'params': '7B'
     },
-    "Qwen2.5-3B-Instruct": {
-        "path":   "Qwen/Qwen2.5-3B-Instruct",
-        "params": "3B",
+    'Gemma-2-9B-it': {
+        'path': 'google/gemma-2-9b-it',
+        'params': '9B'
     },
-    "Qwen2.5-7B-Instruct": {
-        "path":   "Qwen/Qwen2.5-7B-Instruct",
-        "params": "7B",
+   
+    # Seq2seq
+    'FLAN-T5-large': {
+        'path': 'google/flan-t5-large',
+        'params': '780M',
+        'architecture': 'seq2seq'
     },
-    "Gemma-2-9B-it": {
-        "path":   "google/gemma-2-9b-it",
-        "params": "9B",
-    },
-    "Qwen2.5-14B-Instruct": {
-        "path":   "Qwen/Qwen2.5-14B-Instruct",
-        "params": "14B",
-    },
-    "Phi-4": {
-        "path":   "microsoft/phi-4",
-        "params": "14B",
-    },
+    'FLAN-T5-base': {
+        'path': 'google/flan-t5-base',
+        'params': '250M',
+        'architecture': 'seq2seq'
+    }
+
 }
 
+USE_PLANNING = True
+
 # ── Prompt ────────────────────────────────────────────────────────────────────
+NETWORK_CONTEXT = """=== NETWORK TOPOLOGY ===
+
+Interface table (each row is one physical link):
+
+DEVICE  INTERFACE   IP ADDRESS      MASK             NEIGHBOR  NEIGHBOR INTERFACE
+R1      Ethernet0/0 10.0.1.1        255.255.255.0    SW1       Fa0/24
+R1      Ethernet0/1 10.0.12.1       255.255.255.0    R2        Ethernet0/0
+R1      Ethernet0/2 10.0.14.1       255.255.255.0    R4        Ethernet0/0
+R2      Ethernet0/0 10.0.12.2       255.255.255.0    R1        Ethernet0/1
+R2      Ethernet0/1 10.0.23.1       255.255.255.0    R3        Ethernet0/0
+R2      Ethernet0/2 10.0.24.1       255.255.255.0    R4        Ethernet0/1
+R3      Ethernet0/0 10.0.23.2       255.255.255.0    R2        Ethernet0/1
+R3      Ethernet0/1 10.0.34.1       255.255.255.0    R4        Ethernet0/2
+R3      Ethernet0/2 10.0.2.1        255.255.255.0    SW2       Fa0/24
+R4      Ethernet0/0 10.0.14.2       255.255.255.0    R1        Ethernet0/2
+R4      Ethernet0/1 10.0.24.2       255.255.255.0    R2        Ethernet0/2
+R4      Ethernet0/2 10.0.34.2       255.255.255.0    R3        Ethernet0/1
+
+Hosts:
+- h1: IP 10.0.1.10, mask 255.255.255.0, gateway 10.0.1.1, connected to SW1 Fa0/1
+- h2: IP 10.0.2.10, mask 255.255.255.0, gateway 10.0.2.1, connected to SW2 Fa0/1
+
+Switch ports:
+- SW1 Fa0/1  : access port, VLAN 10, connected to h1
+- SW1 Fa0/24 : trunk port, connected to R1 Ethernet0/0, VLANs allowed: 10, 20
+- SW2 Fa0/1  : access port, VLAN 30, connected to h2
+- SW2 Fa0/24 : trunk port, connected to R3 Ethernet0/2, VLANs allowed: 30, 40
+"""
+
 GENERATION_PROMPT = """You are a Cisco network engineer working on an Intent-Based Networking (IBN) system.
 Given the following network configuration requirement, generate the exact Cisco IOS configuration commands needed.
 
@@ -94,10 +128,162 @@ Rules:
 - Do not include explanations, comments, or markdown headers.
 - Use standard Cisco IOS syntax.
 - If the requirement involves multiple devices, separate each device block clearly.
+- Use the topology and constraints as mandatory context; do not invent interfaces, links, IPs, VLANs, or devices outside this context.
+
+=== STRICT RULES ===
+
+- Use ONLY the interfaces defined above
+- Do NOT invent IP addresses or subnets
+- Do NOT use undefined VLANs
+- Do NOT use technologies not present in the topology
+- Use valid Cisco IOS syntax only
+
+- Apply configuration to the correct device
+- Ensure the configuration fully satisfies the requirement
+
+- If the requirement cannot be implemented with the given topology:
+    output exactly: NO_CODE
+
+=== OUTPUT FORMAT ===
+
+- Output ONLY Cisco IOS configuration
+- Do NOT include explanations
+- Do NOT include comments
+- Do NOT include extra text
+
+Examples:
+
+R1# configure terminal
+R1(config)# ...
+R1(config-if)# ...
+R1(config)# end
+
+OR
+
+NO_CODE
+
+=== IMPORTANT ===
+
+- Be precise and minimal
+- Avoid unnecessary commands
+- Do not assume missing information
+
+{network_context}
 
 Requirement: {requirement}
 
 Configuration:"""
+
+
+GENERATION_PROMPT_SEQ2SEQ = """Task: Generate Cisco IOS configuration commands.
+
+Rules:
+- Output only Cisco IOS commands.
+- No explanations, notes, or markdown.
+- Use only devices/interfaces/IPs/VLANs present in topology.
+- If not possible with given topology, output exactly: NO_CODE.
+
+Topology:
+{network_context}
+
+Requirement:
+{requirement}
+
+Answer:
+"""
+
+PLANNING_PROMPT = """You are a senior network engineer.
+
+Identify the key points required to generate a correct Cisco IOS configuration.
+
+Rules:
+
+* Focus on key configuration points
+* Output a concise bullet list using "- " at the start of each line
+* Do NOT include Cisco IOS commands
+* Include only points that are necessary and relevant to satisfy the requirement
+* Cover critical dimensions when applicable: devices, interfaces, addressing, protocols, policy/ACL order, dependencies, and validation checks
+* Do not invent values, devices, links, IPs, VLANs, or constraints outside the topology
+
+Output format example:
+- Key point one
+- Key point two
+- Key point three
+- ...
+
+Do not output explanations, comments, or markdown.
+
+Topology:
+{network_context}
+
+Requirement:
+{requirement}
+
+Plan:
+"""
+
+GENERATION_WITH_PLAN_PROMPT = """You are a Cisco network engineer.
+Generate exact Cisco IOS configuration from the given plan and topology.
+
+=== RULES ===
+- Output ONLY Cisco IOS commands. No explanations, comments, or markdown.
+- Use the plan as guidance for key points when generating the configuration.
+- Use ONLY interfaces, IPs, VLANs, and technologies defined in the topology.
+- Apply configuration to the correct device.
+- Each device block must start with `configure terminal` and end with `end`.
+- When configuring multiple devices, output each block separately in order.
+- Use wildcard masks for OSPF and ACLs. Use dotted-decimal subnet masks for `ip address`.
+- Use next-hop IP addresses for static routes.
+- If the requirement cannot be implemented with the given topology, output exactly: NO_CODE
+
+=== EXAMPLES ===
+
+Example 1 — Single device, interface configuration:
+Requirement: Configure the IP address on R1's interface connecting to R4.
+Configuration:
+R1# configure terminal
+R1(config)# interface Ethernet0/2
+R1(config-if)# ip address 10.0.14.1 255.255.255.0
+R1(config-if)# no shutdown
+R1(config-if)# end
+
+Example 2 — Multiple devices, symmetric configuration:
+Requirement: Configure OSPF authentication on the link between R1 and R2 using password ospfkey.
+Configuration:
+R1# configure terminal
+R1(config)# interface Ethernet0/1
+R1(config-if)# ip ospf authentication
+R1(config-if)# ip ospf authentication-key ospfkey
+R1(config-if)# end
+
+R2# configure terminal
+R2(config)# interface Ethernet0/0
+R2(config-if)# ip ospf authentication
+R2(config-if)# ip ospf authentication-key ospfkey
+R2(config-if)# end
+
+Example 3 — Named ACL with explicit permit at the end:
+Requirement: Configure an extended ACL on R1 to deny TCP traffic from 10.0.1.0/24 to any destination on port 23.
+Configuration:
+R1# configure terminal
+R1(config)# ip access-list extended DENY_TELNET
+R1(config-ext-nacl)# deny tcp 10.0.1.0 0.0.0.255 any eq 23
+R1(config-ext-nacl)# permit ip any any
+R1(config-ext-nacl)# end
+
+=== INPUT ===
+
+Plan:
+{plan}
+
+Topology:
+{network_context}
+
+Requirement:
+{requirement}
+
+Configuration:
+"""
 
 
 # ── Carga del modelo (mismo patron que clasificacion) ─────────────────────────
@@ -142,6 +328,47 @@ def load_model(model_name, model_config):
         return None, None
 
 
+def load_model_seq2seq(model_name, model_config):
+    try:
+        import torch
+        from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+
+        if not torch.cuda.is_available():
+            raise RuntimeError(
+                "\nERROR: CUDA no disponible. Verifica que:\n"
+                "  1. PyTorch con CUDA esta instalado\n"
+                "  2. Los drivers de NVIDIA estan actualizados\n"
+                "  3. Ejecuta: nvidia-smi para verificar la GPU"
+            )
+
+        device = "cuda:0"
+        print(f"\nCargando {model_name} en {torch.cuda.get_device_name(0)}...")
+        print(f"  Cache HF: {HF_HUB_CACHE_DIR}")
+
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_config["path"],
+            trust_remote_code=model_config.get("trust_remote_code", False),
+            cache_dir=HF_HUB_CACHE_DIR,
+            token=HF_TOKEN,
+        )
+        model = AutoModelForSeq2SeqLM.from_pretrained(
+            model_config["path"],
+            dtype=torch.bfloat16,
+            device_map=device,
+            trust_remote_code=model_config.get("trust_remote_code", False),
+            cache_dir=HF_HUB_CACHE_DIR,
+            token=HF_TOKEN,
+        )
+
+        print(f"  VRAM usada: {torch.cuda.memory_allocated(0)/1024**3:.2f} GB")
+        print(f"  Modelo {model_name} cargado exitosamente")
+        return tokenizer, model
+
+    except Exception as e:
+        print(f"Error cargando {model_name}: {e}")
+        return None, None
+
+
 # ── Inferencia: genera una configuracion ─────────────────────────────────────
 def generate_config(requirement, tokenizer, model, max_new_tokens=512):
     try:
@@ -150,7 +377,10 @@ def generate_config(requirement, tokenizer, model, max_new_tokens=512):
         messages = [
             {
                 "role": "user",
-                "content": GENERATION_PROMPT.format(requirement=requirement),
+                "content": GENERATION_PROMPT.format(
+                    requirement=requirement,
+                    network_context=NETWORK_CONTEXT,
+                ),
             }
         ]
         prompt = tokenizer.apply_chat_template(
@@ -180,6 +410,196 @@ def generate_config(requirement, tokenizer, model, max_new_tokens=512):
     except Exception as e:
         print(f"  Error en generacion: {e}")
         return "ERROR"
+
+
+def generate_config_seq2seq(requirement, tokenizer, model, max_new_tokens=512):
+    try:
+        import torch
+        import re
+
+        prompt = GENERATION_PROMPT_SEQ2SEQ.format(
+            requirement=requirement,
+            network_context=NETWORK_CONTEXT,
+        )
+        inputs = tokenizer(
+            prompt, return_tensors="pt", truncation=True, max_length=1024
+        ).to("cuda:0")
+
+        with torch.no_grad():
+            outputs = model.generate(
+                **inputs,
+                max_new_tokens=min(max_new_tokens, 256),
+                do_sample=False,
+                num_beams=4,
+                early_stopping=True,
+                no_repeat_ngram_size=4,
+                length_penalty=0.8,
+                pad_token_id=tokenizer.pad_token_id,
+                eos_token_id=tokenizer.eos_token_id,
+            )
+
+        generated = tokenizer.decode(
+            outputs[0],
+            skip_special_tokens=True,
+        ).strip()
+
+        # Limpia eco de prompt e instrucciones frecuentes en modelos encoder-decoder.
+        stop_markers = [
+            "Requirement:", "Configuration:", "Output:", "Explanation:",
+            "Note:", "===", "Rules:", "Task:", "Topology:", "Answer:",
+        ]
+        cut_positions = [generated.find(m) for m in stop_markers if generated.find(m) != -1]
+        if cut_positions:
+            generated = generated[: min(cut_positions)].strip()
+
+        # Si trae opciones del tipo "... OR NO_CODE", priorizamos NO_CODE.
+        if re.search(r"\bNO_CODE\b", generated):
+            # Si hay comandos reales antes de NO_CODE, conserva comandos.
+            # Si no, devuelve NO_CODE exacto.
+            has_ios_lines = bool(re.search(r"\b(config|interface|router|ip\s)\b", generated, re.IGNORECASE))
+            if not has_ios_lines:
+                return "NO_CODE"
+
+            # Elimina colas redundantes posteriores a OR/NO_CODE.
+            generated = re.sub(r"\bOR\b\s*\bNO_CODE\b.*$", "", generated, flags=re.IGNORECASE | re.DOTALL).strip()
+
+        # Normaliza salida vacia.
+        if not generated:
+            return "NO_CODE"
+
+        return generated
+
+    except Exception as e:
+        print(f"  Error en generacion: {e}")
+        return "ERROR"
+
+
+def generate_with_plan(requirement, tokenizer, model):
+    try:
+        import torch
+        import re
+
+        is_seq2seq = bool(getattr(getattr(model, "config", None), "is_encoder_decoder", False))
+
+        # Step 1: generate high-level plan
+        planning_prompt = PLANNING_PROMPT.format(
+            requirement=requirement,
+            network_context=NETWORK_CONTEXT,
+        )
+
+        if is_seq2seq:
+            plan_inputs = tokenizer(
+                planning_prompt, return_tensors="pt", truncation=True, max_length=1024
+            ).to("cuda:0")
+            with torch.no_grad():
+                plan_outputs = model.generate(
+                    **plan_inputs,
+                    max_new_tokens=128,
+                    do_sample=False,
+                    num_beams=4,
+                    early_stopping=True,
+                    no_repeat_ngram_size=3,
+                )
+            plan = tokenizer.decode(
+                plan_outputs[0],
+                skip_special_tokens=True,
+            ).strip()
+        else:
+            plan_messages = [{"role": "user", "content": planning_prompt}]
+            plan_chat_prompt = tokenizer.apply_chat_template(
+                plan_messages, tokenize=False, add_generation_prompt=True
+            )
+            plan_inputs = tokenizer(
+                plan_chat_prompt, return_tensors="pt", truncation=True, max_length=2048
+            ).to("cuda:0")
+            with torch.no_grad():
+                plan_outputs = model.generate(
+                    **plan_inputs,
+                    max_new_tokens=128,
+                    do_sample=False,
+                    pad_token_id=tokenizer.eos_token_id,
+                    temperature=None,
+                    top_p=None,
+                )
+            plan = tokenizer.decode(
+                plan_outputs[0][plan_inputs["input_ids"].shape[1]:],
+                skip_special_tokens=True,
+            ).strip()
+
+        # Step 2: generate final config using the plan
+        generation_prompt = GENERATION_WITH_PLAN_PROMPT.format(
+            plan=plan,
+            requirement=requirement,
+            network_context=NETWORK_CONTEXT,
+        )
+
+        if is_seq2seq:
+            cfg_inputs = tokenizer(
+                generation_prompt, return_tensors="pt", truncation=True, max_length=1024
+            ).to("cuda:0")
+            with torch.no_grad():
+                cfg_outputs = model.generate(
+                    **cfg_inputs,
+                    max_new_tokens=256,
+                    do_sample=False,
+                    num_beams=4,
+                    early_stopping=True,
+                    no_repeat_ngram_size=4,
+                    length_penalty=0.8,
+                )
+            generated = tokenizer.decode(
+                cfg_outputs[0],
+                skip_special_tokens=True,
+            ).strip()
+        else:
+            cfg_messages = [{"role": "user", "content": generation_prompt}]
+            cfg_chat_prompt = tokenizer.apply_chat_template(
+                cfg_messages, tokenize=False, add_generation_prompt=True
+            )
+            cfg_inputs = tokenizer(
+                cfg_chat_prompt, return_tensors="pt", truncation=True, max_length=2048
+            ).to("cuda:0")
+            with torch.no_grad():
+                cfg_outputs = model.generate(
+                    **cfg_inputs,
+                    max_new_tokens=256,
+                    do_sample=False,
+                    pad_token_id=tokenizer.eos_token_id,
+                    temperature=None,
+                    top_p=None,
+                )
+            generated = tokenizer.decode(
+                cfg_outputs[0][cfg_inputs["input_ids"].shape[1]:],
+                skip_special_tokens=True,
+            ).strip()
+
+        # Enforce final-output cleanliness: no plan/prose, only config or NO_CODE.
+        stop_markers = [
+            "Plan:", "Topology:", "Requirement:", "Configuration:",
+            "Output:", "Explanation:", "Note:", "===",
+        ]
+        cut_positions = [generated.find(m) for m in stop_markers if generated.find(m) != -1]
+        if cut_positions:
+            generated = generated[:min(cut_positions)].strip()
+
+        if re.search(r"\bNO_CODE\b", generated, re.IGNORECASE):
+            has_ios = bool(re.search(r"\b(config|interface|router|ip\s|switchport|access-list|route-map|vlan|spanning-tree|line\s+vty|hostname|enable|copy\s+running-config|end)\b", generated, re.IGNORECASE))
+            if not has_ios:
+                generate_with_plan.last_plan = plan
+                return "NO_CODE"
+            generated = re.sub(r"\bOR\b\s*\bNO_CODE\b.*$", "", generated, flags=re.IGNORECASE | re.DOTALL).strip()
+
+        if not generated:
+            generate_with_plan.last_plan = plan
+            return "NO_CODE"
+
+        generate_with_plan.last_plan = plan
+        return generated
+
+    except Exception as e:
+        print(f"  Error en pipeline con plan: {e}")
+        generate_with_plan.last_plan = ""
+        return "NO_CODE"
 
 
 # ── Metricas ROUGE ────────────────────────────────────────────────────────────
@@ -275,12 +695,21 @@ def evaluate_model(model_name, model_config, df_eval):
     print(f"EVALUANDO: {model_name} ({model_config['params']})")
     print(f"{'='*80}")
 
-    tokenizer, model = load_model(model_name, model_config)
+    architecture = model_config.get("architecture", "causal")
+
+    if architecture == "seq2seq":
+        tokenizer, model = load_model_seq2seq(model_name, model_config)
+        generation_fn = generate_config_seq2seq
+    else:
+        tokenizer, model = load_model(model_name, model_config)
+        generation_fn = generate_config
+
     if tokenizer is None or model is None:
         print(f"Saltando {model_name} — no se pudo cargar.")
         return None
     try:
         predictions = []
+        plans = []
         latencies   = []
         n = len(df_eval)
 
@@ -289,7 +718,12 @@ def evaluate_model(model_name, model_config, df_eval):
                 print(f"  Procesando {i + 1}/{n}...")
 
             t0      = time.time()
-            pred    = generate_config(row[REQUIREMENT_COL], tokenizer, model)
+            if USE_PLANNING:
+                pred = generate_with_plan(row[REQUIREMENT_COL], tokenizer, model)
+                plans.append(getattr(generate_with_plan, "last_plan", ""))
+            else:
+                pred = generation_fn(row[REQUIREMENT_COL], tokenizer, model)
+                plans.append("")
             elapsed = time.time() - t0
 
             predictions.append(pred)
@@ -298,10 +732,10 @@ def evaluate_model(model_name, model_config, df_eval):
         references  = df_eval[GROUND_TRUTH_COL].tolist()
         error_count = predictions.count("ERROR")
 
-        print(f"\n  Calculando ROUGE...")
+        print("\n  Calculando ROUGE...")
         rouge_metrics = compute_rouge(predictions, references)
 
-        print(f"  Calculando BERTScore (codebert-base)...")
+        print("  Calculando BERTScore (codebert-base)...")
         bert_metrics = compute_bertscore(predictions, references)
 
         total_time = sum(latencies)
@@ -317,6 +751,7 @@ def evaluate_model(model_name, model_config, df_eval):
             "avg_time_per_sample": round(avg_time, 4),
             **rouge_metrics,
             **bert_metrics,
+            "plans":               plans,
             "predictions":         predictions,   # guardadas para analisis posterior
         }
 
@@ -350,6 +785,7 @@ def main():
 
     print("=" * 80)
     print("EVALUACION DE GENERACION DE CONFIGURACIONES CISCO")
+    print(f"Modo de evaluacion: {'con plan' if USE_PLANNING else 'sin plan'}")
     print(f"Inicio: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 80)
     print(f"\nDataset: {len(df)} muestras")
@@ -364,7 +800,8 @@ def main():
 
     # ── Guardar resultados ────────────────────────────────────────────────────
     timestamp    = datetime.now().strftime("%Y%m%d_%H%M%S")
-    results_file = f"generation_results_{timestamp}.json"
+    planning_suffix = "_con_plan" if USE_PLANNING else "_sin_plan"
+    results_file = f"generation_results{planning_suffix}_{timestamp}.json"
 
     output = {
         "timestamp":        timestamp,

@@ -65,27 +65,9 @@ MODELS = {
         'path': 'meta-llama/Llama-3.1-8B-Instruct',
         'params': '8B'
     },
-    'Mistral-7B-Instruct': {
-        'path': 'mistralai/Mistral-7B-Instruct-v0.3',
-        'params': '7B'
-    },
     'Zephyr-7B': {
         'path': 'HuggingFaceH4/zephyr-7b-beta',
         'params': '7B'
-    },
-
-    # Pequenos
-    'Llama-3.2-3B-Instruct': {
-        'path': 'meta-llama/Llama-3.2-3B-Instruct',
-        'params': '3B'
-    },
-    'Phi-3.5-mini-instruct': {
-        'path': 'microsoft/Phi-3.5-mini-instruct',
-        'params': 'mini'
-    },
-    'Qwen2.5-3B-Instruct': {
-        'path': 'Qwen/Qwen2.5-3B-Instruct',
-        'params': '3B'
     },
 
     # Medianos
@@ -96,17 +78,8 @@ MODELS = {
     'Gemma-2-9B-it': {
         'path': 'google/gemma-2-9b-it',
         'params': '9B'
-    },
-
-    # Grandes
-    'Qwen2.5-14B-Instruct': {
-        'path': 'Qwen/Qwen2.5-14B-Instruct',
-        'params': '14B'
-    },
-    'Phi-4': {
-        'path': 'microsoft/phi-4',
-        'params': 'N/A'
     }
+
 }
 
 # Prompt template para clasificación

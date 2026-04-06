@@ -1,0 +1,100 @@
+{
+  "timestamp": "20260406_123343",
+  "dataset": "D:\\tesis\\Agent\\dataset_v2.csv",
+  "total_samples": 10,
+  "models_evaluated": [
+    "FLAN-T5-large",
+    "FLAN-T5-base"
+  ],
+  "use_planning": false,
+  "results": [
+    {
+      "model_name": "FLAN-T5-large",
+      "params": "780M",
+      "samples_evaluated": 10,
+      "error_count": 0,
+      "error_rate": 0.0,
+      "total_time_s": 15.78,
+      "avg_time_per_sample": 1.5783,
+      "use_planning": false,
+      "rouge1": 0.0263,
+      "rouge2": 0.0,
+      "rougeL": 0.0263,
+      "rouge1_std": 0.0414,
+      "rouge2_std": 0.0,
+      "rougeL_std": 0.0414,
+      "bertscore_p": 0.8395,
+      "bertscore_r": 0.8068,
+      "bertscore_f1": 0.8227,
+      "bertscore_f1_std": 0.0147,
+      "plans": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "predictions": [
+        "NO_CODE",
+        "No explanations, notes, or markdown.",
+        "NO_CODE",
+        "NO_CODE",
+        "NO_CODE",
+        "NO_CODE",
+        "NO_CODE",
+        "NO_CODE",
+        "No explanations, notes, or markdown.",
+        "sw1 f0 sw2 f1 sw3 sw4 sw5 sw6 sw7 sw8 sw9 sw10 sw11 sw12 sw13 sw14 sw15 sw16 sw17 sw18 sw19 sw20 sw21 sw22 sw23 sw24 sw25 sw26 sw27 sw28 sw29 sw30 sw31 sw32 sw34 sw35 sw36 sw37 sw38 sw39 sw40 sw41 sw42 sw50 sw51 sw52 sw53 sw54 sw55 sw56 sw58 sw59 sw60 sw61 sw62 sw63 sw64 sw65 sw67 sw68 sw69 sw70 sw71 sw72 s"
+      ]
+    },
+    {
+      "model_name": "FLAN-T5-base",
+      "params": "250M",
+      "samples_evaluated": 10,
+      "error_count": 0,
+      "error_rate": 0.0,
+      "total_time_s": 32.88,
+      "avg_time_per_sample": 3.2876,
+      "use_planning": false,
+      "rouge1": 0.052,
+      "rouge2": 0.0155,
+      "rougeL": 0.0441,
+      "rouge1_std": 0.0846,
+      "rouge2_std": 0.0393,
+      "rougeL_std": 0.0701,
+      "bertscore_p": 0.8162,
+      "bertscore_r": 0.8162,
+      "bertscore_f1": 0.8158,
+      "bertscore_f1_std": 0.0429,
+      "plans": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "predictions": [
+        "h1: IP 10.0.1.10, mask 255.255.255.0, gateway 10.0.2.1, connected to SW1 Fa0/1; SW2 Fa0/24: trunk port, connected to R1 Ethernet0/0; SW3 Ethernet0/1: access port, VLAN 10; SW2 Ethernet0/2: VLAN 30; SW4 Ethernet0//2: trunk port",
+        "mtu=1000000000000000000000000000000000000000000000000001 h1 h2 h3 h2",
+        "NO_CODE",
+        "h1: ip, mask: 255.255.255.0, gateway: 10.0.2.1, gateway:10.0.2.1, connected to SW1 Fa0/1 h2: IP, mask:255.255,255.0, connected to SW2 Fa0/1 Switch ports: - SW1: access port, VLAN 10, connected to h1 - SW2: trunk port, connected to R1 Ethernet0/0, VLANs allowed: 10, 20",
+        "NO_CODE",
+        "h1: h2: h3: h4: h5: h6: h7: h8: h9: h10: h11: h12: h13: h14: h15: h16: h17: h18: h19: h20: h21: h22: h23: h24: h25: h26: h27: h28: h29: h30: h31: h32: h33: h35: h36: h37: h39: h41: h45: h47: h51: h52: h53: h54: h55: h56: h57: h58: h59: h60: h67: h70: h71: h78: h77: h79: h80: h81: h82: h83: h90: h91: h92: h93:",
+        "h1: h2: h3: h4: h5: h6: h7: h8: h9: h10: h11: h12: h13: h14: h15: h16: h17: h18: h19: h20: h21: h22: h23: h24: h25: h26: h27: h28: h29: h30: h31: h32: h33: h35: h36: h37: h39: h41: h45: h47: h51: h52: h53: h54: h55: h56: h57: h58: h59: h60: h67: h70: h71: h78: h77: h79: h80: h81: h82: h83: h90: h91: h92: h97:",
+        "h1: h2: h3: h4: h5: h6: h7: h8: h9: h10: h11: h12: h13: h14: h15: h16: h17: h18: h19: h20: h21: h22: h23: h24: h25: h26: h27: h28: h29: h30: h31: h32: h33: h35: h36: h37: h39: h41: h45: h47: h51: h52: h53: h54: h55: h56: h57: h58: h59: h60: h67: h70: h71: h78: h77: h79: h80: h81: h82: h90: h91: h92: h97: h99:",
+        "DHCP_MACHINE_INTERFACE R1 Ethernet0/0 10.0.1.1 255.255.255.0 SW1 Fa0/24 R1ethernet0/0 100.12.1 255.275.255.0 R2ethernet0/1 10.0.12.1 25.255.2755.0 R3ethernet0/2 10.0.12.2 25.255 255.255 R1ether0/1 R2ether0/2 10.0.23.1 25.255,255.0 R3 Ethernet0/1 R3ether0/1 10.0.23.2 25.255",
+        "NO_CODE"
+      ]
+    }
+  ]
+}

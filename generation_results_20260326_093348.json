@@ -1,0 +1,16 @@
+{
+  "timestamp": "20260326_093348",
+  "dataset": "D:\\tesis\\Agent\\dataset.csv",
+  "total_samples": 100,
+  "models_evaluated": [
+    "Zephyr-7B",
+    "Llama-3.2-3B-Instruct",
+    "Phi-3.5-mini-instruct",
+    "Qwen2.5-3B-Instruct",
+    "Qwen2.5-7B-Instruct",
+    "Gemma-2-9B-it",
+    "Qwen2.5-14B-Instruct",
+    "Phi-4"
+  ],
+  "results": []
+}
