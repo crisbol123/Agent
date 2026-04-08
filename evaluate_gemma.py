@@ -22,9 +22,15 @@ def get_quantization_config(model_config):
     elif quant == "int4":
         return BitsAndBytesConfig(
             load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
             bnb_4bit_compute_dtype=torch.bfloat16,
         )
     return None  # Sin cuantizacion, usa dtype del modelo
+
+
+def get_quantization_label(model_config):
+    quant = model_config.get("quantization", None)
+    return quant if quant else "none"
 
 warnings.filterwarnings("ignore")
 
@@ -75,7 +81,7 @@ MODELS = {
     'Qwen2.5-7B-Instruct': {
         'path': 'Qwen/Qwen2.5-7B-Instruct',
         'params': '7B',
-        'quantization': 'int8',
+        'quantization': 'int4',
     },
 }
 
@@ -305,7 +311,10 @@ def load_model(model_name, model_config):
             )
 
         device = "cuda:0"
+        quant_label = get_quantization_label(model_config)
+
         print(f"\nCargando {model_name} en {torch.cuda.get_device_name(0)}...")
+        print(f"  Cuantizacion: {quant_label}")
         print(f"  Cache HF: {HF_HUB_CACHE_DIR}")
 
         quant_config = get_quantization_config(model_config)
@@ -319,7 +328,6 @@ def load_model(model_name, model_config):
 
         load_kwargs = {
             "device_map": device,
-            "trust_remote_code": model_config.get("trust_remote_code", False),
             "cache_dir": HF_HUB_CACHE_DIR,
             "token": HF_TOKEN,
         }
@@ -562,8 +570,10 @@ def compute_bertscore(predictions, references):
 def evaluate_model(model_name, model_config, df_eval):
     import torch
 
+    quant_label = get_quantization_label(model_config)
+
     print(f"\n{'='*80}")
-    print(f"EVALUANDO: {model_name} ({model_config['params']})")
+    print(f"EVALUANDO: {model_name} ({model_config['params']}) | cuantizacion={quant_label}")
     print(f"{'='*80}")
 
     tokenizer, model = load_model(model_name, model_config)
@@ -609,6 +619,7 @@ def evaluate_model(model_name, model_config, df_eval):
         results = {
             "model_name":          model_name,
             "params":              model_config["params"],
+            "quantization":        quant_label,
             "samples_evaluated":   n,
             "error_count":         int(error_count),
             "error_rate":          round(error_count / n, 4),
@@ -656,6 +667,14 @@ def main():
     print(f"\nDataset: {len(df)} muestras")
     print(f"Modelos a evaluar: {len(MODELS)}\n")
 
+    quantization_by_model = {
+        model_name: get_quantization_label(model_config)
+        for model_name, model_config in MODELS.items()
+    }
+    quantization_tags = sorted(set(quantization_by_model.values()))
+    quantization_suffix = "_q-" + "-".join(quantization_tags)
+    print(f"Cuantizacion(es) configurada(s): {', '.join(quantization_tags)}")
+
     all_results = []
 
     for model_name, model_config in MODELS.items():
@@ -666,13 +685,14 @@ def main():
     # ── Guardar resultados ────────────────────────────────────────────────────
     timestamp    = datetime.now().strftime("%Y%m%d_%H%M%S")
     planning_suffix = "_con_plan" if USE_PLANNING else "_sin_plan"
-    results_file = f"generation_results{planning_suffix}_{timestamp}.json"
+    results_file = f"generation_results{planning_suffix}{quantization_suffix}_{timestamp}.json"
 
     output = {
         "timestamp":        timestamp,
         "dataset":          DATASET_FILE,
         "total_samples":    len(df),
         "models_evaluated": list(MODELS.keys()),
+        "quantization_by_model": quantization_by_model,
         "results":          all_results,
     }
 
@@ -680,6 +700,7 @@ def main():
         json.dump(output, f, indent=2)
 
     print(f"\n{'='*80}")
+    print(f"CUANTIZACION(ES) USADA(S): {', '.join(quantization_tags)}")
     print(f"RESULTADOS GUARDADOS EN: {results_file}")
     print(f"{'='*80}")
 
