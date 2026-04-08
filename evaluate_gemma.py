@@ -9,6 +9,23 @@ from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
 
+
+def get_quantization_config(model_config):
+    ""
+    import torch
+    from transformers import BitsAndBytesConfig
+
+    quant = model_config.get("quantization", None)
+
+    if quant == "int8":
+        return BitsAndBytesConfig(load_in_8bit=True)
+    elif quant == "int4":
+        return BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.bfloat16,
+        )
+    return None  # Sin cuantizacion, usa dtype del modelo
+
 warnings.filterwarnings("ignore")
 
 # ── Entorno HuggingFace (igual que clasificacion) ─────────────────────────────
@@ -54,38 +71,12 @@ print(f"Muestras cargadas: {len(df)}")
 
 # ── Modelos (mismos del PDF, mismos paths que clasificacion) ──────────────────
 MODELS = {
-    # Modelos base actuales
-    'Llama-3.1-8B-Instruct': {
-        'path': 'meta-llama/Llama-3.1-8B-Instruct',
-        'params': '8B'
-    },
-    'Zephyr-7B': {
-        'path': 'HuggingFaceH4/zephyr-7b-beta',
-        'params': '7B'
-    },
-
-    # Medianos
+ 
     'Qwen2.5-7B-Instruct': {
         'path': 'Qwen/Qwen2.5-7B-Instruct',
-        'params': '7B'
+        'params': '7B',
+        'quantization': 'int8',
     },
-    'Gemma-2-9B-it': {
-        'path': 'google/gemma-2-9b-it',
-        'params': '9B'
-    },
-   
-    # Seq2seq
-    'FLAN-T5-large': {
-        'path': 'google/flan-t5-large',
-        'params': '780M',
-        'architecture': 'seq2seq'
-    },
-    'FLAN-T5-base': {
-        'path': 'google/flan-t5-base',
-        'params': '250M',
-        'architecture': 'seq2seq'
-    }
-
 }
 
 USE_PLANNING = False
@@ -197,23 +188,6 @@ Requirement:
 Configuration:"""
 
 
-GENERATION_PROMPT_SEQ2SEQ = """Task: Generate Cisco IOS configuration commands.
-
-Rules:
-- Output only Cisco IOS commands.
-- No explanations, notes, or markdown.
-- Use only devices/interfaces/IPs/VLANs present in topology.
-- If not possible with given topology, output exactly: NO_CODE.
-
-Topology:
-{network_context}
-
-Requirement:
-{requirement}
-
-Answer:
-"""
-
 PLANNING_PROMPT = """You are a senior network engineer.
 
 Identify the key points required to generate a correct Cisco IOS configuration.
@@ -308,6 +282,14 @@ Configuration:
 """
 
 
+def build_prompt(tokenizer, messages, plain_prompt):
+    if getattr(tokenizer, "chat_template", None):
+        return tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+    return plain_prompt
+
+
 # ── Carga del modelo (mismo patron que clasificacion) ─────────────────────────
 def load_model(model_name, model_config):
     try:
@@ -326,60 +308,30 @@ def load_model(model_name, model_config):
         print(f"\nCargando {model_name} en {torch.cuda.get_device_name(0)}...")
         print(f"  Cache HF: {HF_HUB_CACHE_DIR}")
 
+        quant_config = get_quantization_config(model_config)
+
         tokenizer = AutoTokenizer.from_pretrained(
             model_config["path"],
             trust_remote_code=model_config.get("trust_remote_code", False),
             cache_dir=HF_HUB_CACHE_DIR,
             token=HF_TOKEN,
         )
+
+        load_kwargs = {
+            "device_map": device,
+            "trust_remote_code": model_config.get("trust_remote_code", False),
+            "cache_dir": HF_HUB_CACHE_DIR,
+            "token": HF_TOKEN,
+        }
+
+        if quant_config:
+            load_kwargs["quantization_config"] = quant_config
+        else:
+            load_kwargs["torch_dtype"] = torch.bfloat16
+
         model = AutoModelForCausalLM.from_pretrained(
             model_config["path"],
-            torch_dtype=torch.bfloat16,
-            device_map=device,
-            trust_remote_code=model_config.get("trust_remote_code", False),
-            cache_dir=HF_HUB_CACHE_DIR,
-            token=HF_TOKEN,
-        )
-
-        print(f"  VRAM usada: {torch.cuda.memory_allocated(0)/1024**3:.2f} GB")
-        print(f"  Modelo {model_name} cargado exitosamente")
-        return tokenizer, model
-
-    except Exception as e:
-        print(f"Error cargando {model_name}: {e}")
-        return None, None
-
-
-def load_model_seq2seq(model_name, model_config):
-    try:
-        import torch
-        from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-
-        if not torch.cuda.is_available():
-            raise RuntimeError(
-                "\nERROR: CUDA no disponible. Verifica que:\n"
-                "  1. PyTorch con CUDA esta instalado\n"
-                "  2. Los drivers de NVIDIA estan actualizados\n"
-                "  3. Ejecuta: nvidia-smi para verificar la GPU"
-            )
-
-        device = "cuda:0"
-        print(f"\nCargando {model_name} en {torch.cuda.get_device_name(0)}...")
-        print(f"  Cache HF: {HF_HUB_CACHE_DIR}")
-
-        tokenizer = AutoTokenizer.from_pretrained(
-            model_config["path"],
-            trust_remote_code=model_config.get("trust_remote_code", False),
-            cache_dir=HF_HUB_CACHE_DIR,
-            token=HF_TOKEN,
-        )
-        model = AutoModelForSeq2SeqLM.from_pretrained(
-            model_config["path"],
-            torch_dtype=torch.bfloat16,
-            device_map=device,
-            trust_remote_code=model_config.get("trust_remote_code", False),
-            cache_dir=HF_HUB_CACHE_DIR,
-            token=HF_TOKEN,
+            **load_kwargs,
         )
 
         print(f"  VRAM usada: {torch.cuda.memory_allocated(0)/1024**3:.2f} GB")
@@ -396,18 +348,17 @@ def generate_config(requirement, tokenizer, model, max_new_tokens=512):
     try:
         import torch
 
+        plain_prompt = GENERATION_PROMPT.format(
+            requirement=requirement,
+            network_context=NETWORK_CONTEXT,
+        )
         messages = [
             {
                 "role": "user",
-                "content": GENERATION_PROMPT.format(
-                    requirement=requirement,
-                    network_context=NETWORK_CONTEXT,
-                ),
+                "content": plain_prompt,
             }
         ]
-        prompt = tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
-        )
+        prompt = build_prompt(tokenizer, messages, plain_prompt)
         inputs = tokenizer(
             prompt, return_tensors="pt", truncation=True, max_length=2048
         ).to("cuda:0")
@@ -420,6 +371,7 @@ def generate_config(requirement, tokenizer, model, max_new_tokens=512):
                 pad_token_id=tokenizer.eos_token_id,
                 temperature=None,
                 top_p=None,
+                top_k=None,
             )
 
         generated = tokenizer.decode(
@@ -434,74 +386,10 @@ def generate_config(requirement, tokenizer, model, max_new_tokens=512):
         return "ERROR"
 
 
-def generate_config_seq2seq(requirement, tokenizer, model, max_new_tokens=512):
-    try:
-        import torch
-        import re
-
-        prompt = GENERATION_PROMPT_SEQ2SEQ.format(
-            requirement=requirement,
-            network_context=NETWORK_CONTEXT,
-        )
-        inputs = tokenizer(
-            prompt, return_tensors="pt", truncation=True, max_length=1024
-        ).to("cuda:0")
-
-        with torch.no_grad():
-            outputs = model.generate(
-                **inputs,
-                max_new_tokens=min(max_new_tokens, 256),
-                do_sample=False,
-                num_beams=4,
-                early_stopping=True,
-                no_repeat_ngram_size=4,
-                length_penalty=0.8,
-                pad_token_id=tokenizer.pad_token_id,
-                eos_token_id=tokenizer.eos_token_id,
-            )
-
-        generated = tokenizer.decode(
-            outputs[0],
-            skip_special_tokens=True,
-        ).strip()
-
-        # Limpia eco de prompt e instrucciones frecuentes en modelos encoder-decoder.
-        stop_markers = [
-            "Requirement:", "Configuration:", "Output:", "Explanation:",
-            "Note:", "===", "Rules:", "Task:", "Topology:", "Answer:",
-        ]
-        cut_positions = [generated.find(m) for m in stop_markers if generated.find(m) != -1]
-        if cut_positions:
-            generated = generated[: min(cut_positions)].strip()
-
-        # Si trae opciones del tipo "... OR NO_CODE", priorizamos NO_CODE.
-        if re.search(r"\bNO_CODE\b", generated):
-            # Si hay comandos reales antes de NO_CODE, conserva comandos.
-            # Si no, devuelve NO_CODE exacto.
-            has_ios_lines = bool(re.search(r"\b(config|interface|router|ip\s)\b", generated, re.IGNORECASE))
-            if not has_ios_lines:
-                return "NO_CODE"
-
-            # Elimina colas redundantes posteriores a OR/NO_CODE.
-            generated = re.sub(r"\bOR\b\s*\bNO_CODE\b.*$", "", generated, flags=re.IGNORECASE | re.DOTALL).strip()
-
-        # Normaliza salida vacia.
-        if not generated:
-            return "NO_CODE"
-
-        return generated
-
-    except Exception as e:
-        print(f"  Error en generacion: {e}")
-        return "ERROR"
-
-
 def generate_with_plan(requirement, tokenizer, model):
     try:
         import torch
         import re
-
-        is_seq2seq = bool(getattr(getattr(model, "config", None), "is_encoder_decoder", False))
 
         # Step 1: generate high-level plan
         planning_prompt = PLANNING_PROMPT.format(
@@ -509,44 +397,25 @@ def generate_with_plan(requirement, tokenizer, model):
             network_context=NETWORK_CONTEXT,
         )
 
-        if is_seq2seq:
-            plan_inputs = tokenizer(
-                planning_prompt, return_tensors="pt", truncation=True, max_length=1024
-            ).to("cuda:0")
-            with torch.no_grad():
-                plan_outputs = model.generate(
-                    **plan_inputs,
-                    max_new_tokens=128,
-                    do_sample=False,
-                    num_beams=4,
-                    early_stopping=True,
-                    no_repeat_ngram_size=3,
-                )
-            plan = tokenizer.decode(
-                plan_outputs[0],
-                skip_special_tokens=True,
-            ).strip()
-        else:
-            plan_messages = [{"role": "user", "content": planning_prompt}]
-            plan_chat_prompt = tokenizer.apply_chat_template(
-                plan_messages, tokenize=False, add_generation_prompt=True
+        plan_messages = [{"role": "user", "content": planning_prompt}]
+        plan_chat_prompt = build_prompt(tokenizer, plan_messages, planning_prompt)
+        plan_inputs = tokenizer(
+            plan_chat_prompt, return_tensors="pt", truncation=True, max_length=2048
+        ).to("cuda:0")
+        with torch.no_grad():
+            plan_outputs = model.generate(
+                **plan_inputs,
+                max_new_tokens=128,
+                do_sample=False,
+                pad_token_id=tokenizer.eos_token_id,
+                temperature=None,
+                top_p=None,
+                top_k=None,
             )
-            plan_inputs = tokenizer(
-                plan_chat_prompt, return_tensors="pt", truncation=True, max_length=2048
-            ).to("cuda:0")
-            with torch.no_grad():
-                plan_outputs = model.generate(
-                    **plan_inputs,
-                    max_new_tokens=128,
-                    do_sample=False,
-                    pad_token_id=tokenizer.eos_token_id,
-                    temperature=None,
-                    top_p=None,
-                )
-            plan = tokenizer.decode(
-                plan_outputs[0][plan_inputs["input_ids"].shape[1]:],
-                skip_special_tokens=True,
-            ).strip()
+        plan = tokenizer.decode(
+            plan_outputs[0][plan_inputs["input_ids"].shape[1]:],
+            skip_special_tokens=True,
+        ).strip()
 
         # Step 2: generate final config using the plan
         generation_prompt = GENERATION_WITH_PLAN_PROMPT.format(
@@ -555,45 +424,25 @@ def generate_with_plan(requirement, tokenizer, model):
             network_context=NETWORK_CONTEXT,
         )
 
-        if is_seq2seq:
-            cfg_inputs = tokenizer(
-                generation_prompt, return_tensors="pt", truncation=True, max_length=1024
-            ).to("cuda:0")
-            with torch.no_grad():
-                cfg_outputs = model.generate(
-                    **cfg_inputs,
-                    max_new_tokens=256,
-                    do_sample=False,
-                    num_beams=4,
-                    early_stopping=True,
-                    no_repeat_ngram_size=4,
-                    length_penalty=0.8,
-                )
-            generated = tokenizer.decode(
-                cfg_outputs[0],
-                skip_special_tokens=True,
-            ).strip()
-        else:
-            cfg_messages = [{"role": "user", "content": generation_prompt}]
-            cfg_chat_prompt = tokenizer.apply_chat_template(
-                cfg_messages, tokenize=False, add_generation_prompt=True
+        cfg_messages = [{"role": "user", "content": generation_prompt}]
+        cfg_chat_prompt = build_prompt(tokenizer, cfg_messages, generation_prompt)
+        cfg_inputs = tokenizer(
+            cfg_chat_prompt, return_tensors="pt", truncation=True, max_length=2048
+        ).to("cuda:0")
+        with torch.no_grad():
+            cfg_outputs = model.generate(
+                **cfg_inputs,
+                max_new_tokens=256,
+                do_sample=False,
+                pad_token_id=tokenizer.eos_token_id,
+                temperature=None,
+                top_p=None,
+                top_k=None,
             )
-            cfg_inputs = tokenizer(
-                cfg_chat_prompt, return_tensors="pt", truncation=True, max_length=2048
-            ).to("cuda:0")
-            with torch.no_grad():
-                cfg_outputs = model.generate(
-                    **cfg_inputs,
-                    max_new_tokens=256,
-                    do_sample=False,
-                    pad_token_id=tokenizer.eos_token_id,
-                    temperature=None,
-                    top_p=None,
-                )
-            generated = tokenizer.decode(
-                cfg_outputs[0][cfg_inputs["input_ids"].shape[1]:],
-                skip_special_tokens=True,
-            ).strip()
+        generated = tokenizer.decode(
+            cfg_outputs[0][cfg_inputs["input_ids"].shape[1]:],
+            skip_special_tokens=True,
+        ).strip()
 
         # Enforce final-output cleanliness: no plan/prose, only config or NO_CODE.
         stop_markers = [
@@ -717,14 +566,8 @@ def evaluate_model(model_name, model_config, df_eval):
     print(f"EVALUANDO: {model_name} ({model_config['params']})")
     print(f"{'='*80}")
 
-    architecture = model_config.get("architecture", "causal")
-
-    if architecture == "seq2seq":
-        tokenizer, model = load_model_seq2seq(model_name, model_config)
-        generation_fn = generate_config_seq2seq
-    else:
-        tokenizer, model = load_model(model_name, model_config)
-        generation_fn = generate_config
+    tokenizer, model = load_model(model_name, model_config)
+    generation_fn = generate_config
 
     if tokenizer is None or model is None:
         print(f"Saltando {model_name} — no se pudo cargar.")
