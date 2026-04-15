@@ -1,0 +1,7 @@
+model_name,path,params,snapshot_path,disk_size_bytes,disk_size_gb,vram_allocated_after_load_bytes,vram_allocated_after_load_gb,vram_peak_during_load_bytes,vram_peak_during_load_gb,status,error,elapsed_s
+Llama-3.1-8B-Instruct,meta-llama/Llama-3.1-8B-Instruct,8B,D:\huggingface\hub\models--meta-llama--Llama-3.1-8B-Instruct\snapshots\0e9e39f249a16976918f6564b8830bc894c89659,16071964731,14.9682,16060523008,14.9575,16060523008,14.9575,ok,,17.34
+Zephyr-7B,HuggingFaceH4/zephyr-7b-beta,7B,D:\huggingface\hub\models--HuggingFaceH4--zephyr-7b-beta\snapshots\892b3d7a7b1cf10c7a701c60881cd93df615734c,14485813038,13.491,14483464704,13.4888,14483464704,13.4888,ok,,12.53
+Qwen2.5-7B-Instruct,Qwen/Qwen2.5-7B-Instruct,7B,D:\huggingface\hub\models--Qwen--Qwen2.5-7B-Instruct\snapshots\a09a35458c702b33eeacc393d103063234e8bc28,15242788168,14.196,15233854976,14.1876,15233854976,14.1876,ok,,12.55
+Gemma-2-9B-it,google/gemma-2-9b-it,9B,D:\huggingface\hub\models--google--gemma-2-9b-it\snapshots\11c9b309abf73637e4b6f9a3fa1e92e615547819,18505320542,17.2344,18483412480,17.214,18483412480,17.214,ok,,18.46
+FLAN-T5-large,google/flan-t5-large,780M,D:\huggingface\hub\models--google--flan-t5-large\snapshots\0613663d0d48ea86ba8cb3d7a44f0f65dc596a2a,3135890073,2.9205,1607194624,1.4968,1738790912,1.6194,ok,,4.46
+FLAN-T5-base,google/flan-t5-base,250M,D:\huggingface\hub\models--google--flan-t5-base\snapshots\7bcac572ce56db69c1ea7c8af255c5d7c9672fc2,993567070,0.9253,506756096,0.472,605453312,0.5639,ok,,1.38

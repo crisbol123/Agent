@@ -78,10 +78,10 @@ print(f"Muestras cargadas: {len(df)}")
 # ── Modelos (mismos del PDF, mismos paths que clasificacion) ──────────────────
 MODELS = {
  
-    'Qwen2.5-7B-Instruct': {
+   'Llama-3.1-8B-Instruct': {
         'path': 'Qwen/Qwen2.5-7B-Instruct',
-        'params': '7B',
-        'quantization': 'int4',
+        'params': '8B',
+        'quantization': 'none',
     },
 }
 
